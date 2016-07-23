@@ -24,9 +24,10 @@ public class RollDiceAction implements GameAction {
 
     @Override
     public GameActionResult perform(Player player) {
-        // TODO: Find out if player has rolled doubles three times a row, then go directly to Jail
-
         Game game = player.getGame();
+        if (game.isTaskType(GameTask.GameTaskType.ROLL)) {
+
+        }
         int previousTile = player.getPosition();
         int tileCount = game.getTileCount();
         boolean passGo = (previousTile + getTotal()) / tileCount > 0;
@@ -41,10 +42,10 @@ public class RollDiceAction implements GameAction {
         property.land(player, this);
 
         // if player has rolled doubles, then take turn again
-        if (!isDoubles()) {
+        if (!isDoubles() && game.isEmptyStack()) {
             player.getGame().nextPlayer();
         }
-        return null;
+        return new GameActionResult(true, player.getName() + " landed on " + property.getName());
     }
 
     private boolean isDoubles() {

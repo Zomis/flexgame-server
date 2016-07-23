@@ -11,7 +11,6 @@ public class Game {
     // Throw to get out of Jail or pay or use card, Decide starting plaayer?
     // It doesn't have to be the current player who has to do something, for example "collect $50 from all players"
     private final Deque<GameTask> stack = new LinkedList<>();
-    private GameTask defaultTask;
 
     private GameSetup setup;
     private int currentPlayer;
@@ -58,6 +57,18 @@ public class Game {
 
     public GameSetup getSetup() {
         return setup;
+    }
+
+    public void addState(GameTask gameTask) {
+        this.stack.addLast(gameTask);
+    }
+
+    public GameTask getState() {
+        return this.stack.getFirst();
+    }
+
+    public boolean isTaskType(GameTask.GameTaskType type) {
+        return getState().getType() == type;
     }
 
 }

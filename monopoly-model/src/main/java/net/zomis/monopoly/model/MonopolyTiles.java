@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public class MonopolyTiles {
 
-    private static final LandAction LAND_ON_PROPERTY_ACTION = null;
+    private static final LandAction LAND_ON_PROPERTY_ACTION = MonopolyTiles::landOnProperty;
     private static final LandAction DO_NOTHING = (player, tile, byAction) -> {};
     private static final int[] UTILITY_RENT_MULTIPLICATOR = { 0, 4, 10 };
 
@@ -110,8 +110,21 @@ public class MonopolyTiles {
         }
     }
 
-    private static void buyOrNotBuy(Player player, Property tile, GameAction byAction) {
+    public static void landOnProperty(Player player, Property tile, GameAction byAction) {
+        if (tile.hasOwner()) {
+            Player opponent = tile.getOwner().get();
+            int rent = tile.getCurrentRent();
+            player.pay(opponent, rent);
+        } else {
+            buyOrNotBuy(player, tile, byAction);
+        }
+    }
 
+    private static void buyOrNotBuy(Player player, Property tile, GameAction byAction) {
+        if (tile.hasOwner()) {
+            throw new IllegalStateException(tile.getName() + " is already owned by " + tile.getOwner().get().getName());
+        }
+        player.getGame().addState(GameTask.buyOrNot(player, tile));
     }
 
     private static Property util(PropertyGroup utilityGroup, String name) {

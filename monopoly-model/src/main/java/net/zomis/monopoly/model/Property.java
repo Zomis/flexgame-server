@@ -13,9 +13,12 @@ public class Property {
     private final LandAction action;
     private PropertyGroup group;
     private int houseCount;
-    private Optional<Player> owner;
+    private Optional<Player> owner = Optional.empty();
 
     public Property(String name, int cost, int[] rents, LandAction action) {
+        if (action == null) {
+            throw new NullPointerException("Action is required for property: " + name);
+        }
         this.name = name;
         this.cost = cost;
         this.rents = rents;

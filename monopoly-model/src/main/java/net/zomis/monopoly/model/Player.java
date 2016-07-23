@@ -8,7 +8,8 @@ public class Player {
     private Inventory<Property> inventory;
     private Piece piece;
     private int position;
-    private int money;
+    private int money = 2000;
+    private int doublesRolled;
 
     public Player(Game game, int index, String name) {
         this.game = game;
@@ -32,8 +33,13 @@ public class Player {
         return action.isAllowed(this);
     }
 
-    public void pay(Player opponent, long rent) {
-        throw new UnsupportedOperationException();
+    public void pay(Player opponent, long amount) {
+        this.money -= amount;
+        if (opponent != null) {
+            opponent.money += amount;
+        } else {
+            // check if free parking should collect the money
+        }
     }
 
     public Game getGame() {

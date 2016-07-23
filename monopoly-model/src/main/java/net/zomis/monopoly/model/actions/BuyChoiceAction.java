@@ -1,26 +1,37 @@
 package net.zomis.monopoly.model.actions;
 
-import net.zomis.monopoly.model.GameAction;
-import net.zomis.monopoly.model.GameActionResult;
-import net.zomis.monopoly.model.Player;
+import net.zomis.monopoly.model.*;
 
 public class BuyChoiceAction {
 
     public static final GameAction BUY = new GameAction() {
         @Override
         public boolean isAllowed(Player player) {
-            return false;
+            if (!isBuyChoice(player)) {
+                return false;
+            }
+            return player.getMoney() >= player.getGame().getState().getProperty().getCost();
         }
 
         @Override
         public GameActionResult perform(Player player) {
-            return null;
+            GameTask state = player.getGame().getState();
+            Property property = state.getProperty();
+            player.pay(null, property.getCost());
+            property.setOwner(player);
+            return new GameActionResult(true, player.getName() + " bought " + property);
         }
     };
+
+    private static boolean isBuyChoice(Player player) {
+        GameTask state = player.getGame().getState();
+        return state.getType() == GameTask.GameTaskType.BUY_OR_NOT && state.getActor() == player;
+    }
+
     public static final GameAction NOT_BUY = new GameAction() {
         @Override
         public boolean isAllowed(Player player) {
-            return false;
+            return isBuyChoice(player);
         }
 
         @Override
