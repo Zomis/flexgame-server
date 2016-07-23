@@ -45,6 +45,7 @@ public class Game {
 
     public void nextPlayer() {
         currentPlayer = (currentPlayer + 1) % players.size();
+        getCurrentPlayer().doublesRolled = 0;
     }
 
     public int getTileCount() {
@@ -69,6 +70,19 @@ public class Game {
 
     public boolean isTaskType(GameTask.GameTaskType type) {
         return getState().getType() == type;
+    }
+
+    public int getPropertyIndex(Property property) {
+        for (int i = 0; i < properties.size(); i++) {
+            if (properties.get(i) == property) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Property " + property.getName() + " not found");
+    }
+
+    public GameTask popState() {
+        return this.stack.removeFirst();
     }
 
 }

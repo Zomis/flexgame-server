@@ -25,8 +25,14 @@ public class RollDiceAction implements GameAction {
     @Override
     public GameActionResult perform(Player player) {
         Game game = player.getGame();
-        if (game.isTaskType(GameTask.GameTaskType.ROLL)) {
-
+        if (isDoubles()) {
+            player.addDoublesRolled();
+        }
+        if (player.getDoublesRolled() == 3) {
+            player.gotoJail();
+            Property property = player.getPositionProperty();
+            property.land(player, this);
+            return new GameActionResult(true, player.getName() + " went to " + property.getName());
         }
         int previousTile = player.getPosition();
         int tileCount = game.getTileCount();
@@ -41,10 +47,6 @@ public class RollDiceAction implements GameAction {
         Property property = player.getPositionProperty();
         property.land(player, this);
 
-        // if player has rolled doubles, then take turn again
-        if (!isDoubles() && game.isEmptyStack()) {
-            player.getGame().nextPlayer();
-        }
         return new GameActionResult(true, player.getName() + " landed on " + property.getName());
     }
 

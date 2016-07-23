@@ -15,7 +15,7 @@ public class BuyChoiceAction {
 
         @Override
         public GameActionResult perform(Player player) {
-            GameTask state = player.getGame().getState();
+            GameTask state = player.getGame().popState();
             Property property = state.getProperty();
             player.pay(null, property.getCost());
             property.setOwner(player);

@@ -9,7 +9,8 @@ public class Player {
     private Piece piece;
     private int position;
     private int money = 2000;
-    private int doublesRolled;
+    int doublesRolled;
+    private boolean inJail;
 
     public Player(Game game, int index, String name) {
         this.game = game;
@@ -26,7 +27,14 @@ public class Player {
     }
 
     public GameActionResult perform(GameAction action) {
-        return action.perform(this);
+        GameActionResult result = action.perform(this);
+        if (result.isOk()) {
+            // if player has rolled doubles, then take turn again
+            if (doublesRolled == 0 && game.isEmptyStack()) {
+                game.nextPlayer();
+            }
+        }
+        return result;
     }
 
     public boolean isAllowed(GameAction action) {
@@ -69,4 +77,23 @@ public class Player {
     public Piece getPiece() {
         return piece;
     }
+
+    public int getDoublesRolled() {
+        return doublesRolled;
+    }
+
+    public void addDoublesRolled() {
+        doublesRolled++;
+    }
+
+    public void gotoJail() {
+        this.doublesRolled = 0;
+        this.inJail = true;
+        this.position = game.getPropertyIndex(MonopolyTiles.JAIL);
+    }
+
+    public boolean isInJail() {
+        return inJail;
+    }
+
 }

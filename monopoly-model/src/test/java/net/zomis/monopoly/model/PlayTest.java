@@ -77,9 +77,13 @@ public class PlayTest {
 
     @Test
     public void visitOwnProperty() {
-        game.getProperty(3).setOwner(game.getCurrentPlayer());
+        Player owner = game.getCurrentPlayer();
+        int money = owner.getMoney();
+        game.getProperty(3).setOwner(owner);
         perform(game, new RollDiceAction(2, 1));
-        throw new UnsupportedOperationException("Need to assert something here");
+        assertEquals(owner, game.getProperty(3).getOwner().get());
+        assertEquals(game.getPlayer(1), game.getCurrentPlayer());
+        assertEquals(money, owner.getMoney());
     }
 
 }

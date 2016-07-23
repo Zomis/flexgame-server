@@ -24,7 +24,7 @@ public class MonopolyTiles {
     private static final Property COMMUNITY_CHEST = unbuyableProperty("Community Chest", DO_NOTHING);
     private static final Property INCOME_TAX = unbuyableProperty("Income Tax", DO_NOTHING);
     private static final Property CHANCE = unbuyableProperty("Chance", DO_NOTHING);
-    private static final Property JAIL = unbuyableProperty("Jail", DO_NOTHING);
+    public static final Property JAIL = unbuyableProperty("Jail", DO_NOTHING);
 
     private static Property unbuyableProperty(String name, LandAction action) {
         return new Property(name, 0, null, action);
