@@ -25,7 +25,7 @@ public class BuyChoiceAction {
 
     private static boolean isBuyChoice(Player player) {
         GameTask state = player.getGame().getState();
-        return state.getType() == GameTask.GameTaskType.BUY_OR_NOT && state.getActor() == player;
+        return state != null && state.getType() == GameTask.GameTaskType.BUY_OR_NOT && state.getActor() == player;
     }
 
     public static final GameAction NOT_BUY = new GameAction() {
@@ -36,7 +36,7 @@ public class BuyChoiceAction {
 
         @Override
         public GameActionResult perform(Player player) {
-            return null;
+            throw new UnsupportedOperationException("Auctions not implemented yet");
         }
     };
 

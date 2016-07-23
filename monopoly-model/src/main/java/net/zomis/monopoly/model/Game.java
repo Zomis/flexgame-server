@@ -65,7 +65,7 @@ public class Game {
     }
 
     public GameTask getState() {
-        return this.stack.getFirst();
+        return this.stack.peekFirst();
     }
 
     public boolean isTaskType(GameTask.GameTaskType type) {

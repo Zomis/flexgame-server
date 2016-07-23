@@ -18,7 +18,8 @@ public class MonopolyTiles {
     private static final Property FREE_PARKING = new Property("Free Parking", 0, null, DO_NOTHING);
 
     // Unimplemented
-    private static final Property GO_TO_JAIL = unbuyableProperty("Go to Jail", DO_NOTHING);
+    public static final Property GO_TO_JAIL = unbuyableProperty("Go to Jail", MonopolyTiles::gotoJail);
+
     private static final Property LUXURY_TAX = unbuyableProperty("Luxury Tax", DO_NOTHING);
     private static final Property GO = unbuyableProperty("Go", DO_NOTHING);
     private static final Property COMMUNITY_CHEST = unbuyableProperty("Community Chest", DO_NOTHING);
@@ -188,6 +189,10 @@ public class MonopolyTiles {
             return this;
         }
 
+    }
+
+    private static void gotoJail(Player player, Property property, GameAction action) {
+        player.gotoJail();
     }
 
 }

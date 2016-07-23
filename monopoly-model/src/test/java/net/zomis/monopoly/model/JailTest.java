@@ -1,7 +1,10 @@
 package net.zomis.monopoly.model;
 
+import net.zomis.monopoly.model.actions.BuyChoiceAction;
+import net.zomis.monopoly.model.actions.RollDiceAction;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class JailTest {
 
@@ -18,12 +21,42 @@ public class JailTest {
 
     @Test
     public void gotoJailSquare() {
-        throw new UnsupportedOperationException();
+        Player player = game.getCurrentPlayer();
+        player.setPosition(26);
+        assertEquals(MonopolyTiles.GO_TO_JAIL, game.getProperty(30));
+        TestUtils.perform(game, new RollDiceAction(3, 1));
+        assertTrue(player.isInJail());
+        assertEquals(MonopolyTiles.JAIL, player.getPositionProperty());
+        assertEquals(game.getPlayer(1), game.getCurrentPlayer());
+    }
+
+    @Test
+    public void gotoJailSquareDoubles() {
+        Player player = game.getCurrentPlayer();
+        player.setPosition(26);
+        assertEquals(MonopolyTiles.GO_TO_JAIL, game.getProperty(30));
+        TestUtils.perform(game, new RollDiceAction(2, 2));
+        assertTrue(player.isInJail());
+        assertEquals(MonopolyTiles.JAIL, player.getPositionProperty());
+        assertEquals(game.getPlayer(1), game.getCurrentPlayer());
     }
 
     @Test
     public void gotoJailThrowingDoublesThreeTimes() {
-        throw new UnsupportedOperationException();
+        Player player = game.getCurrentPlayer();
+        TestUtils.perform(game, new RollDiceAction(3, 3));
+        TestUtils.perform(game, BuyChoiceAction.BUY);
+        assertEquals(player, game.getCurrentPlayer());
+
+        TestUtils.perform(game, new RollDiceAction(4, 4));
+        TestUtils.perform(game, BuyChoiceAction.BUY);
+        assertEquals(player, game.getCurrentPlayer());
+
+        TestUtils.perform(game, new RollDiceAction(1, 1));
+        assertTrue(player.isInJail());
+        assertEquals(MonopolyTiles.JAIL, player.getPositionProperty());
+        assertEquals(game.getPlayer(1), game.getCurrentPlayer());
+        assertFalse(game.getCurrentPlayer().isAllowed(BuyChoiceAction.BUY));
     }
 
     @Test

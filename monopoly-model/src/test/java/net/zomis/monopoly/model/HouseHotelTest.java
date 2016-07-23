@@ -1,7 +1,9 @@
 package net.zomis.monopoly.model;
 
 import net.zomis.monopoly.model.actions.BuildAction;
+import net.zomis.monopoly.model.actions.RollDiceAction;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -58,15 +60,29 @@ public class HouseHotelTest {
     @Test
     public void preventBuyingHousesWhenYouDoNotOwnGroup() {
         game.getProperty(1).setOwner(game.getCurrentPlayer());
-        assertFalse(game.getCurrentPlayer().isAllowed(new BuildAction(2, game.getProperty(3))));
+        assertFalse(game.getCurrentPlayer().isAllowed(new BuildAction(1, game.getProperty(1))));
     }
 
     @Test
     public void visitHotel() {
-        throw new UnsupportedOperationException();
+        Player opponent = game.getPlayer(1);
+        int opponentMoney = opponent.getMoney();
+        game.getProperty(1).setOwner(opponent);
+        game.getProperty(3).setOwner(opponent);
+        game.getProperty(1).setHouseCount(5);
+        game.getProperty(3).setHouseCount(5);
+        assertEquals(450, game.getProperty(3).getCurrentRent());
+
+        Player player = game.getCurrentPlayer();
+        int money = player.getMoney();
+        TestUtils.perform(game, new RollDiceAction(1, 3));
+        assertEquals(opponent, game.getCurrentPlayer());
+        assertEquals(money - 450, player.getMoney());
+        assertEquals(opponentMoney + 450, opponent.getMoney());
     }
 
     @Test
+    @Ignore
     public void auctionHousesWhenFewExist() {
         throw new UnsupportedOperationException("Buildings are currently infinite");
     }
