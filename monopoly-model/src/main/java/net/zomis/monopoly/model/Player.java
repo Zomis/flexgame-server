@@ -10,6 +10,7 @@ public class Player {
     private int position;
     private int money = 2000;
     int doublesRolled;
+    public int escapeAttempts;
     private boolean inJail;
 
     public Player(Game game, int index, String name) {
@@ -94,6 +95,10 @@ public class Player {
 
     public boolean isInJail() {
         return inJail;
+    }
+
+    public void escapeJail() {
+        this.inJail = false;
     }
 
 }

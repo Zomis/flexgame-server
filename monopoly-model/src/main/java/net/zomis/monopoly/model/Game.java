@@ -46,6 +46,9 @@ public class Game {
     public void nextPlayer() {
         currentPlayer = (currentPlayer + 1) % players.size();
         getCurrentPlayer().doublesRolled = 0;
+        if (getCurrentPlayer().isInJail()) {
+            addState(new GameTask(GameTask.GameTaskType.GET_OUT_OF_JAIL_CHOICE));
+        }
     }
 
     public int getTileCount() {
@@ -69,7 +72,7 @@ public class Game {
     }
 
     public boolean isTaskType(GameTask.GameTaskType type) {
-        return getState().getType() == type;
+        return getState() != null && getState().getType() == type;
     }
 
     public int getPropertyIndex(Property property) {

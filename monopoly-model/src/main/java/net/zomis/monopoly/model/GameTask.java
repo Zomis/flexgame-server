@@ -16,7 +16,8 @@ public class GameTask {
         BUY_OR_NOT,
         CHOOSE_NUMBER,
         PAY_MONEY,
-        ESCAPE_JAIL_OPTIONS, ROLL;
+        ROLL,
+        GET_OUT_OF_JAIL_CHOICE;
     }
 
     private final GameTaskType type;

@@ -50,7 +50,7 @@ public class RollDiceAction implements GameAction {
         return new GameActionResult(true, player.getName() + " landed on " + property.getName());
     }
 
-    private boolean isDoubles() {
+    public boolean isDoubles() {
         return Arrays.stream(values).distinct().count() == 1;
     }
 

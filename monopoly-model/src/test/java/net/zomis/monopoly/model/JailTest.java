@@ -1,9 +1,13 @@
 package net.zomis.monopoly.model;
 
 import net.zomis.monopoly.model.actions.BuyChoiceAction;
+import net.zomis.monopoly.model.actions.EscapeChoiceAction;
 import net.zomis.monopoly.model.actions.RollDiceAction;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Random;
+
 import static org.junit.Assert.*;
 
 public class JailTest {
@@ -61,22 +65,55 @@ public class JailTest {
 
     @Test
     public void visitJail() {
-        throw new UnsupportedOperationException();
+        game.getPlayer(1).gotoJail();
+        assertEquals(game.getPlayer(0), game.getCurrentPlayer());
+        TestUtils.perform(game, new RollDiceAction(5, 5));
+        assertEquals(game.getPlayer(0).getPositionProperty(), game.getPlayer(1).getPositionProperty());
+        assertFalse(game.getPlayer(0).isInJail());
+        assertTrue(game.getPlayer(1).isInJail());
     }
 
     @Test
     public void payToLeaveJail() {
-        throw new UnsupportedOperationException();
+        prepareJail();
+        Player player = game.getCurrentPlayer();
+        TestUtils.perform(game, EscapeChoiceAction.pay(new RollDiceAction(2, 3)));
+        assertFalse(player.isInJail());
+        assertEquals(15, player.getPosition());
     }
 
     @Test
     public void escapeJailByThrowingDoubles() {
-        throw new UnsupportedOperationException();
+        prepareJail();
+        Player player = game.getCurrentPlayer();
+        TestUtils.perform(game, EscapeChoiceAction.roll(new RollDiceAction(2, 2)));
+        assertFalse(player.isInJail());
+    }
+
+    private Player prepareJail() {
+        game.getPlayer(1).gotoJail();
+        game.nextPlayer();
+        return game.getCurrentPlayer();
+    }
+
+    @Test
+    public void cannotChooseEscapePlanIfNotInJail() {
+        assertFalse(game.getCurrentPlayer().isInJail());
+        assertFalse(game.getCurrentPlayer().isAllowed(EscapeChoiceAction.roll(new RollDiceAction(4, 2))));
     }
 
     @Test
     public void stuckInJailByNotThrowingDoubles() {
-        throw new UnsupportedOperationException();
+        Player player = prepareJail();
+        TestUtils.perform(game, EscapeChoiceAction.roll(new RollDiceAction(4, 2)));
+        assertTrue(player.isInJail());
+        assertEquals(player, game.getCurrentPlayer());
+    }
+
+    @Test
+    public void needToDecideOnEscapePlanBeforeThrowing() {
+        Player player = prepareJail();
+        assertFalse(player.isAllowed(RollDiceAction.roll(new Random())));
     }
 
 }
