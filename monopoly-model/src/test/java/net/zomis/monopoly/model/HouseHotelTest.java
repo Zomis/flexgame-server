@@ -75,7 +75,8 @@ public class HouseHotelTest {
 
         Player player = game.getCurrentPlayer();
         int money = player.getMoney();
-        TestUtils.perform(game, new RollDiceAction(1, 3));
+        TestUtils.perform(game, new RollDiceAction(1, 2));
+        assertEquals(opponent, player.getPositionProperty().getOwner().orElse(null));
         assertEquals(opponent, game.getCurrentPlayer());
         assertEquals(money - 450, player.getMoney());
         assertEquals(opponentMoney + 450, opponent.getMoney());
