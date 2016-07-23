@@ -6,15 +6,15 @@ import java.util.List;
 public class GameSetup {
 
     private boolean speedDie;
-    private final List<Player> players = new ArrayList<>();
+    private final List<String> players = new ArrayList<>();
 
     public GameSetup addPlayer(String name) {
-        this.players.add(new Player(name));
+        this.players.add(name);
         return this;
     }
 
     public Game create() {
-        return new Game(this, players);
+        return Game.createGame(this, players);
     }
 
     public GameSetup withSpeedDie(boolean speedDie) {

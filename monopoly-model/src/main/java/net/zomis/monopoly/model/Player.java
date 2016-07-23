@@ -2,13 +2,17 @@ package net.zomis.monopoly.model;
 
 public class Player {
 
+    private final Game game;
+    private final String name;
+    private final int index;
     private Inventory<Property> inventory;
     private Piece piece;
-    private Tile tile;
+    private int position;
     private int money;
-    private final String name;
 
-    public Player(String name) {
+    public Player(Game game, int index, String name) {
+        this.game = game;
+        this.index = index;
         this.name = name;
     }
 
@@ -28,4 +32,35 @@ public class Player {
         return action.isAllowed(this);
     }
 
+    public void pay(Player opponent, long rent) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void collect(int money) {
+        this.money += money;
+    }
+
+    public Property getPositionProperty() {
+        return this.game.getProperty(position);
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public Piece getPiece() {
+        return piece;
+    }
 }
