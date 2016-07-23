@@ -28,10 +28,19 @@ public class PlayTest {
     public void buyProperty() {
         int money = game.getCurrentPlayer().getMoney();
         perform(game, new RollDiceAction(2, 1));
+        assertEquals(game.getPlayer(0), game.getCurrentPlayer());
+        TestUtils.expectedTaskType(game, GameTask.GameTaskType.BUY_OR_NOT);
         perform(game, BuyChoiceAction.BUY);
         int cost = game.getProperty(3).getCost();
-        assertEquals(TestUtils.getPreviousPlayer(game), game.getProperty(3).getOwner());
+        assertEquals(TestUtils.getPreviousPlayer(game), game.getProperty(3).getOwner().get());
         assertEquals(money - cost, TestUtils.getPreviousPlayer(game).getMoney());
+    }
+
+    @Test
+    public void cannotRollWhenNeedToMakeDecision() {
+        perform(game, new RollDiceAction(2, 1));
+        assertEquals(GameTask.GameTaskType.BUY_OR_NOT, game.getState().getType());
+        assertFalse(game.getCurrentPlayer().isAllowed(RollDiceAction.roll(new Random())));
     }
 
     @Test
