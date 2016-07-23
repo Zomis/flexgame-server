@@ -66,4 +66,9 @@ public class HouseHotelTest {
         throw new UnsupportedOperationException();
     }
 
+    @Test
+    public void auctionHousesWhenFewExist() {
+        throw new UnsupportedOperationException("Buildings are currently infinite");
+    }
+
 }
