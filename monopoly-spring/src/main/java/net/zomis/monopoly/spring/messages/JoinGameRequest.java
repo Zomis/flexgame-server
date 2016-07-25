@@ -1,6 +1,4 @@
-package net.zomis.monopoly.spring;
-
-import java.util.UUID;
+package net.zomis.monopoly.spring.messages;
 
 public class JoinGameRequest {
 

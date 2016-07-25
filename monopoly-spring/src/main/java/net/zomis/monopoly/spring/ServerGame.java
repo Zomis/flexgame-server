@@ -2,7 +2,9 @@ package net.zomis.monopoly.spring;
 
 import net.zomis.monopoly.model.Game;
 import net.zomis.monopoly.model.Player;
-import net.zomis.monopoly.model.actions.RollDiceAction;
+import net.zomis.monopoly.spring.messages.GameDetails;
+import net.zomis.monopoly.spring.messages.GameInfo;
+import net.zomis.monopoly.spring.messages.JoinGameResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;

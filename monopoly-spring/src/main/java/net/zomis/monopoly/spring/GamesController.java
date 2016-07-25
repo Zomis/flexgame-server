@@ -2,7 +2,7 @@ package net.zomis.monopoly.spring;
 
 import net.zomis.monopoly.model.GameSetup;
 import net.zomis.monopoly.model.actions.RollDiceAction;
-import net.zomis.monopoly.spring.requests.StartGameRequest;
+import net.zomis.monopoly.spring.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

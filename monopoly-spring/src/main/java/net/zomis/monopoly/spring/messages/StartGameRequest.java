@@ -1,4 +1,4 @@
-package net.zomis.monopoly.spring.requests;
+package net.zomis.monopoly.spring.messages;
 
 public class StartGameRequest {
 

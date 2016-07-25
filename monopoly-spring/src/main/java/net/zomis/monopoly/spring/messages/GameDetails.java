@@ -1,6 +1,8 @@
-package net.zomis.monopoly.spring;
+package net.zomis.monopoly.spring.messages;
 
 import net.zomis.monopoly.model.Game;
+import net.zomis.monopoly.spring.GamePlayer;
+import net.zomis.monopoly.spring.GameProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package net.zomis.monopoly.spring;
+package net.zomis.monopoly.spring.messages;
 
 import java.util.List;
 import java.util.UUID;
