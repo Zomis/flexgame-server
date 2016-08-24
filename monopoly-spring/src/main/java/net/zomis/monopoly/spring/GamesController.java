@@ -5,13 +5,10 @@ import net.zomis.monopoly.model.actions.RollDiceAction;
 import net.zomis.monopoly.spring.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,19 +36,22 @@ public class GamesController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<JoinGameResponse> startNewGame(@RequestBody StartGameRequest request) {
+    public ResponseEntity<CreateGameResponse> startNewGame(@RequestBody StartGameRequest request) {
         logger.info("Received start game request: " + request);
-        if (!request.isSpeedDie()) {
+        if (request.isSpeedDie()) {
             return ResponseEntity.status(418).body(null);
         }
         GameSetup setup = new GameSetup().withSpeedDie(request.isSpeedDie());
         ServerGame game = new ServerGame(setup.create());
         games.put(game.getUUID(), game);
-        return game.addPlayer(request.getPlayerName(), request.getPiece());
+
+        ResponseEntity<JoinGameResponse> joinResponse = game.addPlayer(request.getPlayerName(), request.getPiece());
+        CreateGameResponse response = new CreateGameResponse(game.getUUID(), UUID.fromString(joinResponse.getBody().getUuid()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @RequestMapping(value = "/{uuid}/join", method = RequestMethod.POST)
-    public ResponseEntity<JoinGameResponse> joinGame(@PathParam("uuid") String uuid, @RequestBody JoinGameRequest request) {
+    public ResponseEntity<JoinGameResponse> joinGame(@PathVariable("uuid") String uuid, @RequestBody JoinGameRequest request) {
         logger.info("Received join game request: " + request);
         Optional<ServerGame> game = getGame(UUID.fromString(uuid));
         if (!game.isPresent()) {
@@ -61,7 +61,7 @@ public class GamesController {
     }
 
     @RequestMapping(value = "/{uuid}/summary", method = RequestMethod.GET)
-    public ResponseEntity<GameInfo> summary(@PathParam("uuid") String uuid, @RequestBody JoinGameRequest request) {
+    public ResponseEntity<GameInfo> summary(@PathVariable("uuid") String uuid, @RequestBody JoinGameRequest request) {
         logger.info("Received summary request: " + request);
         Optional<ServerGame> game = getGame(UUID.fromString(uuid));
         if (!game.isPresent()) {
@@ -71,7 +71,7 @@ public class GamesController {
     }
 
     @RequestMapping(value = "/{uuid}", method = RequestMethod.GET)
-    public ResponseEntity<GameDetails> getDetailedInfo(@PathParam("uuid") String uuid) {
+    public ResponseEntity<GameDetails> getDetailedInfo(@PathVariable("uuid") String uuid) {
         logger.info("Received details request: " + uuid);
         Optional<ServerGame> game = getGame(UUID.fromString(uuid));
         if (!game.isPresent()) {
@@ -81,8 +81,8 @@ public class GamesController {
     }
 
     @RequestMapping(value = "/{gameUUID}/player/{playerUUID}/roll", method = RequestMethod.GET)
-    public ResponseEntity<GameMoveResult> roll(@PathParam("gameUUID") String gameUUID,
-            @PathParam("playerUUID") String playerUUID) {
+    public ResponseEntity<GameMoveResult> roll(@PathVariable("gameUUID") String gameUUID,
+            @PathVariable("playerUUID") String playerUUID) {
         logger.info("Received roll request: " + playerUUID + " in game " + gameUUID);
         Optional<ServerGame> game = getGame(UUID.fromString(gameUUID));
         if (!game.isPresent()) {
