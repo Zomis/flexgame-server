@@ -18,16 +18,23 @@
       <profile default="true" name="Default" enabled="false">
         <processorPath useClasspath="true" />
       </profile>
-      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+      <profile default="false" name="Annotation profile for monopoly-model" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="monopoly-model" />
+      </profile>
+      <profile default="false" name="Annotation profile for monopoly-spring" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
         <module name="monopoly-spring" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="monopoly" target="1.5" />
       <module name="monopoly-model" target="1.8" />
       <module name="monopoly-spring" target="1.8" />
     </bytecodeTargetLevel>
