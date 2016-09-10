@@ -55,5 +55,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: net.minidev:asm:1.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: asm:asm:3.3.1" level="project" />
     <orderEntry type="module" module-name="monopoly-model" />
+    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:2.4.7" level="project" />
   </component>
 </module>
