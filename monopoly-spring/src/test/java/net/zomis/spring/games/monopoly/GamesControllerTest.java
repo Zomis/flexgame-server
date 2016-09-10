@@ -1,4 +1,4 @@
-package net.zomis.monopoly.spring;
+package net.zomis.spring.games.monopoly;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,7 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.zomis.monopoly.spring.messages.StartGameRequest;
+import net.zomis.spring.games.Application;
+import net.zomis.spring.games.messages.StartGameRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +52,8 @@ public class GamesControllerTest {
 	public void createGameRequestShouldCreateGame() throws Exception {
         StartGameRequest request = new StartGameRequest();
         request.setPlayerName("Zomis");
-        request.setSpeedDie(true);
+/*        MonopolyConfig config = new MonopolyConfig();
+        request.setSpeedDie(true);*/
 
 		this.mockMvc.perform(postRequest("/games", request))
             .andDo(print())

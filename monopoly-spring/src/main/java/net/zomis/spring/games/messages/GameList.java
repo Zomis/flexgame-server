@@ -1,4 +1,6 @@
-package net.zomis.monopoly.spring.messages;
+package net.zomis.spring.games.messages;
+
+import net.zomis.spring.games.messages.GameInfo;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package net.zomis.monopoly.spring;
+package net.zomis.spring.games.monopoly;
 
 import net.zomis.monopoly.model.Player;
 import net.zomis.monopoly.model.Property;
