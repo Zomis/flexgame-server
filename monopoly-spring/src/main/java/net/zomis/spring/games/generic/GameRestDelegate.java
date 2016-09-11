@@ -1,6 +1,7 @@
 package net.zomis.spring.games.generic;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.zomis.spring.games.messages.CreateGameResponse;
 import net.zomis.spring.games.messages.GameList;
 import net.zomis.spring.games.messages.JoinGameResponse;
 import net.zomis.spring.games.messages.GameMoveResult;
@@ -9,12 +10,9 @@ import net.zomis.spring.games.monopoly.messages.JoinGameRequest;
 import net.zomis.spring.games.messages.StartGameRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.websocket.server.PathParam;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,11 +43,14 @@ public class GameRestDelegate {
         return new GameList(games.values().stream().map(GenericGame::getGameInfo).collect(Collectors.toList()));
     }
 
-    public ResponseEntity<JoinGameResponse> startNewGame(StartGameRequest request) {
+    public ResponseEntity<CreateGameResponse> startNewGame(StartGameRequest request) {
         logger.info("Received start game request: " + request);
         GenericGame game = new GenericGame(helper, helper.constructGame(request.getGameConfig()), tokenGenerator);
         games.put(game.getUUID(), game);
-        return game.addPlayer(request.getPlayerName(), request.getPlayerConfig());
+
+        ResponseEntity<JoinGameResponse> joinResponse = game.addPlayer(request.getPlayerName(), request.getPlayerConfig());
+        CreateGameResponse response = new CreateGameResponse(game.getUUID(), UUID.fromString(joinResponse.getBody().getUuid()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     public ResponseEntity<JoinGameResponse> joinGame(String gameID, JoinGameRequest request) {
