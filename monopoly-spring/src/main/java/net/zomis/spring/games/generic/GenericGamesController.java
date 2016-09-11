@@ -6,14 +6,25 @@ import net.zomis.spring.games.messages.*;
 import net.zomis.spring.games.monopoly.messages.JoinGameRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController("/games/")
-public class GenericGamesController {
+@RestController
+@RequestMapping("/games")
+public class GenericGamesController implements InitializingBean {
+
+    @Autowired
+    private GroovyGames games;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     private final Map<String, GameRestDelegate> gameTypes = new HashMap<>();
 
@@ -26,6 +37,11 @@ public class GenericGamesController {
             throw new IllegalArgumentException("No such game type: " + gameType + ", available game types are " + gameTypes.keySet());
         }
         return delegate;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        games.initialize(new InputStreamReader(resourceLoader.getResource("classpath:monopoly.groovy").getInputStream()));
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)
@@ -71,6 +87,5 @@ public class GenericGamesController {
              @RequestParam("token") String authToken, @RequestBody JsonNode action) {
         return delegate(gameType).action(game, authToken, type, action);
     }
-
 
 }
