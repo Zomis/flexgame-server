@@ -39,6 +39,10 @@ public class GroovyGames {
         gameClosure.call();
     }
 
+    public GameRestDelegate getGame(String name) {
+        return this.games.get(name);
+    }
+
     private static class GroovyGameDelegate {
         private int minPlayers;
         private int maxPlayers;
@@ -102,4 +106,8 @@ public class GroovyGames {
 
     }
 
+    @Override
+    public String toString() {
+        return games.toString();
+    }
 }

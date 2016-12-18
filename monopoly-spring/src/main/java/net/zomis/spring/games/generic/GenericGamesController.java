@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/games")
@@ -54,6 +55,11 @@ public class GenericGamesController implements InitializingBean {
         HashMap<Object, Object> map = new HashMap<>();
         map.put("name", name);
         return new ObjectMapper().valueToTree(map);
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public Set<String> gameTypes() {
+        return gameTypes.keySet();
     }
 
     @RequestMapping(value = "/{gameType}/", method = RequestMethod.GET)
