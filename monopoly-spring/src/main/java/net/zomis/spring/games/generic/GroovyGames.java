@@ -4,6 +4,8 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import groovy.util.DelegatingScript;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GroovyGames {
+
+    private static final Logger logger = LoggerFactory.getLogger(GroovyGames.class);
 
     private final Map<String, GameRestDelegate> games = new HashMap<>();
 
@@ -34,9 +38,13 @@ public class GroovyGames {
     }
 
     public void game(String name, Class<?> gameClass, Closure<?> gameClosure) {
+        logger.info("game: " + name + " with game class " + gameClass);
         GroovyGameDelegate delegate = new GroovyGameDelegate();
         gameClosure.setDelegate(delegate);
         gameClosure.call();
+        GameHelper helper = delegate.helper;
+        games.put(name, new GameRestDelegate(helper, new TokenGenerator()));
+        logger.info("game '" + name + "' resulted in " + delegate);
     }
 
     public GameRestDelegate getGame(String name) {
@@ -49,9 +57,11 @@ public class GroovyGames {
         private Class<?> gameConfigClass;
         private Class<?> playerConfigClass;
         private Closure<?> gameInfo;
+        private GroovyGameHelper helper = new GroovyGameHelper();
 
-        GroovyGameDelegate players(int min) {
-            this.minPlayers = min;
+        GroovyGameDelegate players(int count) {
+            this.minPlayers = count;
+            this.maxPlayers = count;
             return this;
         }
 

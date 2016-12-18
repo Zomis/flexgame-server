@@ -26,23 +26,23 @@ game("Monopoly", Game.class) {
     config(MonopolyConfig.class)
     playerConfig(Piece.class)
     actions {
-        System.out.println "test"
+        System.out.println "Initializing Monopoly actions..."
         // ActionController.addAvailableAction(action)
         // some systems can prevent action
         action 'roll', { Game game, Player who ->
 
         }
         action 'choose', String.class, { Game game, Player who ->
-
+            // action
         }
         action 'jailChoice', String.class, { Game game, Player who ->
 
         }
         action 'bid', BidAction.class, { Game game, Player who ->
-
+            // action.bid
         }
         action 'build', BuildAction.class, { Game game, Player who ->
-
+            // action.stuff
         }
     }
     gameInfo { Game game, Player who ->
@@ -68,18 +68,6 @@ game("Battleship") {
         }
         move(PointXY.class) { Game game, Player who ->
             // after setup phase, make a move
-        }
-    }
-
-}
-
-game("UTTT") {
-    players 2
-    config null
-
-    actions {
-        move(XYMove.class) {
-            // action.x, action.y
         }
     }
 

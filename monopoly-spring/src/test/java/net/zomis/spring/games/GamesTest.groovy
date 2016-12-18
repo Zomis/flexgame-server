@@ -11,12 +11,12 @@ class GamesTest {
     @Before
     void setup() {
         games = new GroovyGames();
-        games.initialize(new InputStreamReader(this.class.classLoader.getResourceAsStream("monopoly.groovy")));
+        games.initialize(new InputStreamReader(this.class.classLoader.getResourceAsStream("ttt.groovy")));
     }
 
     @Test
-    void monopolyShouldBeAvailable() {
-        assert games.getGame('monopoly')
+    void ticTacToeShouldBeAvailable() {
+        assert games.getGame('ttt')
     }
 
 }

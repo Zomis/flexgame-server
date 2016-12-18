@@ -30,6 +30,9 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GamesControllerTest {
 
+    @Autowired
+    private TestRestTemplate restTemplate;
+
 	@Autowired
 	private WebApplicationContext ctx;
 
@@ -44,7 +47,8 @@ public class GamesControllerTest {
 
 	@Test
 	public void gameListRequestShouldReturnList() throws Exception {
-		this.mockMvc.perform(get("/games"))
+        System.out.println(port);
+        this.mockMvc.perform(get("/games/monopoly"))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.games").isArray());
@@ -57,7 +61,7 @@ public class GamesControllerTest {
 /*        MonopolyConfig config = new MonopolyConfig();
         request.setSpeedDie(true);*/
 
-		this.mockMvc.perform(postRequest("/games", request))
+		this.mockMvc.perform(postRequest("/games/monopoly", request))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.uuid").isString());
