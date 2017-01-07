@@ -3,6 +3,7 @@ package net.zomis.spring.games.generic;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class TokenGenerator {
 
@@ -15,7 +16,8 @@ public class TokenGenerator {
         String hex;
         do {
             random.nextBytes(token);
-            hex = toHex(token);
+            UUID uuid = UUID.nameUUIDFromBytes(token);
+            hex = uuid.toString(); //toHex(token);
         } while (!usedTokens.add(hex));
         return hex;
     }

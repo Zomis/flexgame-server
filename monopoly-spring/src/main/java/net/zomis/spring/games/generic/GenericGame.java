@@ -43,15 +43,14 @@ public class GenericGame {
 //        if (playerKeys.containsKey(playerName)) {
 //            return ResponseEntity.badRequest().body(null);
 //        }
-        UUID playerKey = UUID.randomUUID();
+        String token = tokenGenerator.generateToken();
         synchronized (playerKeys) {
-            String token = tokenGenerator.generateToken();
             playerKeys.add(new PlayerInGame(playerName, playerKeys.size() - 1,
                 token, object));
         }
         logger.info("Added player to game: " + this + " keys are now: " + playerKeys);
 
-        return ResponseEntity.ok(new JoinGameResponse(playerKey));
+        return ResponseEntity.ok(new JoinGameResponse(UUID.fromString(token)));
     }
 
     public Object getGameDetails() {
