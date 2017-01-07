@@ -41,8 +41,9 @@ public class GenericGame {
 //        }
         UUID playerKey = UUID.randomUUID();
         synchronized (playerKeys) {
+            String token = tokenGenerator.generateToken();
             playerKeys.add(new PlayerInGame(playerName, playerKeys.size() - 1,
-                tokenGenerator.generateToken(), object));
+                token, object));
         }
 
         return ResponseEntity.ok(new JoinGameResponse(playerKey));
