@@ -79,9 +79,9 @@ public class GenericGamesController implements InitializingBean {
         return delegate(gameType).joinGame(gameID, request);
     }
 
-    @RequestMapping(value = "/{gameType}/{game}/summary", method = RequestMethod.GET)
-    public ResponseEntity<GameInfo> summary(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
-        return delegate(gameType).summary(game);
+    @RequestMapping(value = "/{gameType}/{game}/details", method = RequestMethod.GET)
+    public ResponseEntity<Object> details(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
+        return delegate(gameType).getDetailedInfo(game);
     }
 
     @RequestMapping(value = "/{gameType}/{game}/start", method = RequestMethod.POST)
@@ -90,8 +90,8 @@ public class GenericGamesController implements InitializingBean {
     }
 
     @RequestMapping(value = "/{gameType}/{game}", method = RequestMethod.GET)
-    public ResponseEntity<Object> getDetailedInfo(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
-        return delegate(gameType).getDetailedInfo(game);
+    public ResponseEntity<GameInfo> summary(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
+        return delegate(gameType).summary(game);
     }
 
     @RequestMapping(value = "/{gameType}/{game}/actions/{type}", method = RequestMethod.POST)
