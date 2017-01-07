@@ -22,7 +22,7 @@ make replays more script-like?
 return a list of events that are called internally? (public events, private events?)
 */
 
-game("Monopoly", Game.class) {
+game("monopoly", Game.class) {
 //    stateful true
     players 2 to 8
     setup(MonopolyConfig.class) {MonopolyConfig config ->
