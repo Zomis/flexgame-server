@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.zomis.spring.games.Application;
 import net.zomis.spring.games.messages.StartGameRequest;
 import org.junit.Before;
 import org.junit.Test;
