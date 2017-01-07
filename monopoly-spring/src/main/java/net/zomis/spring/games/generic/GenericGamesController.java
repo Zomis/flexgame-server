@@ -64,12 +64,12 @@ public class GenericGamesController implements InitializingBean {
         return games.getGames().keySet();
     }
 
-    @RequestMapping(value = "/{gameType}/", method = RequestMethod.GET)
+    @RequestMapping(value = "/{gameType}", method = RequestMethod.GET)
     public GameList listGames(@PathVariable("gameType") String gameType) {
         return delegate(gameType).listGames();
     }
 
-    @RequestMapping(value = "/{gameType}/", method = RequestMethod.POST)
+    @RequestMapping(value = "/{gameType}", method = RequestMethod.POST)
     public ResponseEntity<CreateGameResponse> startNewGame(@PathVariable("gameType") String gameType, StartGameRequest request) {
         return delegate(gameType).startNewGame(request);
     }
