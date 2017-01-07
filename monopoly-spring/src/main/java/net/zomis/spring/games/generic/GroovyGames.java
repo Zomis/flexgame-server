@@ -65,6 +65,15 @@ public class GroovyGames {
             return this;
         }
 
+        public void setup(Class<?> gameConfigClass, Closure<?> closure) {
+            this.gameConfigClass = gameConfigClass;
+            helper.constructor = closure::call;
+        }
+
+        public void playerType(Class<?> playerConfigClass) {
+            this.playerConfigClass = playerConfigClass;
+        }
+
         public void to(int max) {
             this.maxPlayers = max;
         }

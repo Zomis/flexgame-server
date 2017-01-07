@@ -1,4 +1,5 @@
 import net.zomis.monopoly.model.Game
+import net.zomis.monopoly.model.GameSetup
 import net.zomis.monopoly.model.MonopolyConfig
 import net.zomis.monopoly.model.Piece
 import net.zomis.monopoly.model.Player
@@ -23,7 +24,11 @@ return a list of events that are called internally? (public events, private even
 
 game("Monopoly", Game.class) {
     players 2 to 8
-    config(MonopolyConfig.class)
+    setup(MonopolyConfig.class) {MonopolyConfig config ->
+        GameSetup setup = new GameSetup()
+            .withSpeedDie(config.speedDie);
+        return new Game(setup);
+    }
     playerConfig(Piece.class)
     actions {
         System.out.println "Initializing Monopoly actions..."
