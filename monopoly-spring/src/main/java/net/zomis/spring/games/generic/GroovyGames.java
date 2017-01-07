@@ -26,6 +26,7 @@ public class GroovyGames {
     }
 
     public void initialize(Reader resource) throws URISyntaxException, IOException {
+        logger.info("Initializing from reader: " + resource);
         if (resource == null) {
             throw new NullPointerException("resource not found");
         }
@@ -35,6 +36,7 @@ public class GroovyGames {
         DelegatingScript script = (DelegatingScript) shell.parse(resource);
         script.setDelegate(this);
         script.run();
+        logger.info("Games available after initialization: " + games.keySet());
     }
 
     public void game(String name, Class<?> gameClass, Closure<?> gameClosure) {
