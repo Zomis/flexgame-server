@@ -27,7 +27,21 @@ public class RestTest {
     }
 
     public Object get(String path) {
+        if (path.startsWith('/')) {
+            path = path.substring(1);
+        }
+        String request = this.prefix + path;
+        logger.info("GET Request to $request");
+        URL url = new URL(request);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setInstanceFollowRedirects(false);
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setUseCaches(false);
 
+        String text = conn.inputStream.text
+        logger.info("Result: " + text);
+        return new JsonSlurper().parseText(text)
     }
 
     public Object post(String path, Closure<?> data) {
