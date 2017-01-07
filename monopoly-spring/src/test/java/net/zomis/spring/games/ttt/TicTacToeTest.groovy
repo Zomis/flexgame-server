@@ -1,9 +1,11 @@
 package net.zomis.spring.games.ttt
 
+import net.zomis.spring.games.generic.GroovyGames
 import net.zomis.spring.test.RestTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit4.SpringRunner
@@ -17,10 +19,21 @@ class TicTacToeTest {
 
     private RestTest test;
 
+    @Autowired
+    private GroovyGames games;
 
     @Before
     void setup() {
         test = RestTest.localhost(port);
+        games.initialize(new InputStreamReader(this.class.classLoader.getResourceAsStream('ttt.groovy')))
+    }
+
+    @Test
+    void availableGames() {
+        def result = test.get('games').with {
+            assert (it as Set<String>).contains('ttt')
+            assert (it as Set<String>).contains('monopoly')
+        }
     }
 
     @Test
