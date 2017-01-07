@@ -62,19 +62,19 @@ class TicTacToeTest {
         test.post("games/ttt/$gameId/start", {
             privateKey key1
         }).with {
-            assert it;
+            assert it.started == true;
         }
 
-        test.post("games/ttt/$gameId/action", {
+        test.post("games/ttt/$gameId/actions/move?token=" + key1, {
             privateKey key1
-            action 'move'
             actionParams {
                 x 1
                 y 1
             }
         }).with {
-            actionResult 'ok'
+            assert it.status == 'ok'
         }
+
     }
 
 }

@@ -25,7 +25,7 @@ public class GroovyGameHelper implements GameHelper<Object, Object> {
 
     @Override
     public GameMoveResult performAction(int playerIndex, Object action) {
-        return null;
+        return new GameMoveResult("ok");
     }
 
     @Override

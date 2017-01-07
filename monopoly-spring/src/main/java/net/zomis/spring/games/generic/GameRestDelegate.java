@@ -87,6 +87,9 @@ public class GameRestDelegate {
             return ResponseEntity.badRequest().body(new GameMoveResult("Player in game not found"));
         }
         GameMoveResult result = helper.performAction(player.get().getIndex(), jsonNode);
+        if (result == null) {
+            throw new NullPointerException("Perform action must return a response");
+        }
         return ResponseEntity.ok(result);
     }
 
