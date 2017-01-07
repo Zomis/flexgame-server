@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -27,15 +26,18 @@ public class GenericGamesController implements InitializingBean {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    private final Map<String, GameRestDelegate> gameTypes = new HashMap<>();
-
     private static final Logger logger = LoggerFactory.getLogger(GenericGamesController.class);
 
+    public GroovyGames getGames() {
+        return games;
+    }
+
     private GameRestDelegate delegate(String gameType) {
-        GameRestDelegate delegate = gameTypes.get(gameType);
+        GameRestDelegate delegate = games.getGame(gameType);
         if (delegate == null) {
             // Return bad request?
-            throw new IllegalArgumentException("No such game type: " + gameType + ", available game types are " + gameTypes.keySet());
+            throw new IllegalArgumentException("No such game type: " + gameType +
+                ", available game types are " + games.getGames().keySet());
         }
         return delegate;
     }
@@ -59,7 +61,7 @@ public class GenericGamesController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET)
     public Set<String> gameTypes() {
-        return gameTypes.keySet();
+        return games.getGames().keySet();
     }
 
     @RequestMapping(value = "/{gameType}/", method = RequestMethod.GET)
