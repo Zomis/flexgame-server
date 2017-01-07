@@ -23,8 +23,9 @@ public class TokenGenerator {
     private String toHex(byte[] token) {
         StringBuilder str = new StringBuilder(token.length * 2);
         for (int i = 0; i < token.length; i++) {
-            str.append(i / 16);
-            str.append(i % 16);
+            int value = Byte.toUnsignedInt(token[i]);
+            String hex = Integer.toHexString(value);
+            str.append(hex);
         }
         return str.toString();
     }
