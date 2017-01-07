@@ -4,14 +4,14 @@ import java.util.UUID;
 
 public class JoinGameResponse {
 
-    private final UUID uuid;
+    private final UUID privateKey;
 
     public JoinGameResponse(UUID uuid) {
-        this.uuid = uuid;
+        this.privateKey = uuid;
     }
 
-    public String getUuid() {
-        return uuid.toString();
+    public String getPrivateKey() {
+        return privateKey.toString();
     }
 
 }

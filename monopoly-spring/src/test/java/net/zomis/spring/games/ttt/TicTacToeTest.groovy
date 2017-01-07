@@ -53,6 +53,10 @@ class TicTacToeTest {
         result = test.post("games/ttt/$gameId/join", {
             playerName 'Player2'
         })
+        result.with {
+            assert it;
+            assert it.privateKey;
+        }
         String key2 = result.privateKey;
 
         test.post("games/ttt/$gameId/start", {
