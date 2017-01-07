@@ -44,9 +44,17 @@ public class GamesControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 	}
 
-	@Test
+    @Test
+    public void gameListTypes() throws Exception {
+        System.out.println(games.getGames().toString());
+        this.mockMvc.perform(get("/games"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", contains("monopoly")));
+    }
+
+    @Test
 	public void gameListRequestShouldReturnList() throws Exception {
-        System.out.println(port);
         this.mockMvc.perform(get("/games/monopoly"))
             .andDo(print())
             .andExpect(status().isOk())
