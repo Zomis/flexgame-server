@@ -45,7 +45,7 @@ public class GenericGame {
 //        }
         String token = tokenGenerator.generateToken();
         synchronized (playerKeys) {
-            playerKeys.add(new PlayerInGame(playerName, playerKeys.size() - 1,
+            playerKeys.add(new PlayerInGame(playerName, playerKeys.size(),
                 token, object));
         }
         logger.info("Added player to game: " + this + " keys are now: " + playerKeys);

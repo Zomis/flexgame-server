@@ -66,18 +66,15 @@ class TicTacToeTest {
         }
 
         test.post("games/ttt/$gameId/actions/move?token=" + key1, {
-            privateKey key1
-            actionParams {
-                x 1
-                y 1
-            }
+            x 1
+            y 1
         }).with {
             assert it.status == 'ok'
         }
 
         test.get("games/ttt/$gameId/details").with {
             assert it.turn == 'O'
-            assert it.state == [[null,null,null], [null,'X',null], [null,null,null]];
+            assert it.board == [[null,null,null], [null,'X',null], [null,null,null]];
         }
     }
 

@@ -94,6 +94,7 @@ public class GroovyGames {
             ActionsDelegate delegate = new ActionsDelegate();
             closure.setDelegate(delegate);
             closure.call();
+            helper.actions = delegate.actions;
         }
 
         public void gameInfo(Closure<?> closure) {
@@ -116,10 +117,10 @@ public class GroovyGames {
 
     private static class ActionsDelegate {
 
-        private final List<GroovyAction> actions = new ArrayList<>();
+        private final Map<String, GroovyAction> actions = new HashMap<>();
 
         public void action(String name, Class<?> parameter, Closure<?> perform) {
-            this.actions.add(new GroovyAction(name, parameter, perform));
+            this.actions.put(name, new GroovyAction(name, parameter, perform));
         }
 
         public void action(String name, Closure<?> perform) {
@@ -128,10 +129,10 @@ public class GroovyGames {
 
     }
 
-    private static class GroovyAction {
-        private final String name;
-        private final Class<?> parameter;
-        private final Closure<?> perform;
+    public static class GroovyAction {
+        public final String name;
+        public final Class<?> parameter;
+        public final Closure<?> perform;
 
         public GroovyAction(String name, Class<?> parameter, Closure<?> perform) {
             this.name = name;

@@ -22,6 +22,10 @@ public class PlayerInGame {
         return index;
     }
 
+    public Object getGame() {
+        return game;
+    }
+
     public boolean hasToken(String authToken) {
         return this.authToken.equals(authToken);
     }

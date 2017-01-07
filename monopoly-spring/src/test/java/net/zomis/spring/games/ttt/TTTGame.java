@@ -22,6 +22,10 @@ public class TTTGame {
         moves++;
     }
 
+    public TTPlayer getPlayerByIndex(int index) {
+        return TTPlayer.values()[index];
+    }
+
     public TTPlayer[][] getBoard() {
         return Arrays.stream(board)
             .map(b -> Arrays.copyOf(b, b.length))

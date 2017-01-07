@@ -1,13 +1,18 @@
 package net.zomis.spring.games.generic;
 
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zomis.spring.games.messages.GameMoveResult;
 
+import java.util.Map;
 import java.util.function.Function;
 
 public class GroovyGameHelper implements GameHelper<Object, Object> {
 
     public Function<Object, Object> constructor;
     public Function<Object, Object> details;
+    public Map<String, GroovyGames.GroovyAction> actions;
+
 
     @Override
     public Object constructGame(Object configuration) {
@@ -25,7 +30,10 @@ public class GroovyGameHelper implements GameHelper<Object, Object> {
     }
 
     @Override
-    public GameMoveResult performAction(int playerIndex, Object action) {
+    public GameMoveResult performAction(PlayerInGame playerInGame, String actionType, TreeNode data) {
+        GroovyGames.GroovyAction action = actions.get(actionType);
+        Object actionData = new ObjectMapper().convertValue(data, action.parameter);
+        action.perform.call(new Action(playerInGame, actionData));
         return new GameMoveResult("ok");
     }
 

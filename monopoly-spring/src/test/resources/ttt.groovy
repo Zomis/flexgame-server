@@ -1,5 +1,6 @@
 import net.zomis.spring.games.ttt.TTTGame;
 import net.zomis.spring.games.ttt.TTPlayer;
+import net.zomis.spring.games.generic.Action;
 
 class XYMove {
     int x;
@@ -14,8 +15,8 @@ game("ttt", TTTGame.class) {
     config null
 
     actions {
-        action('move', XYMove.class) { TTTGame game, TTPlayer who ->
-            game.move(who, action.x, action.y)
+        action('move', XYMove.class) {Action action ->
+            action.game.move(action.game.getPlayerByIndex(action.playerIndex), action.actionData.x, action.actionData.y)
         }
     }
 
