@@ -3,7 +3,7 @@ package net.zomis.spring.games.generic;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zomis.spring.games.messages.*;
-import net.zomis.spring.games.monopoly.messages.JoinGameRequest;
+import net.zomis.spring.games.messages.JoinGameRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
