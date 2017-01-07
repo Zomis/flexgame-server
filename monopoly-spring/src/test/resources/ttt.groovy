@@ -5,8 +5,8 @@ class XYMove {
     int x;
     int y;
 }
-game("TTT", TTTGame.class) {
-    setup {
+game("ttt", TTTGame.class) {
+    setup(null) {
         return new TTTGame();
     }
     players 2
@@ -14,7 +14,7 @@ game("TTT", TTTGame.class) {
     config null
 
     actions {
-        action 'move', XYMove.class { TTTGame game, TTPlayer who ->
+        action('move', XYMove.class) { TTTGame game, TTPlayer who ->
             game.move(who, action.x, action.y)
         }
     }
