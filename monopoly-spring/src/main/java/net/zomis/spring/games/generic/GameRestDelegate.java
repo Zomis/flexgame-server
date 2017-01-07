@@ -1,13 +1,7 @@
 package net.zomis.spring.games.generic;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.zomis.spring.games.messages.CreateGameResponse;
-import net.zomis.spring.games.messages.GameList;
-import net.zomis.spring.games.messages.JoinGameResponse;
-import net.zomis.spring.games.messages.GameMoveResult;
-import net.zomis.spring.games.messages.GameInfo;
-import net.zomis.spring.games.messages.JoinGameRequest;
-import net.zomis.spring.games.messages.StartGameRequest;
+import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -43,7 +37,7 @@ public class GameRestDelegate {
         return new GameList(games.values().stream().map(GenericGame::getGameInfo).collect(Collectors.toList()));
     }
 
-    public ResponseEntity<CreateGameResponse> startNewGame(StartGameRequest request) {
+    public ResponseEntity<CreateGameResponse> startNewGame(CreateGameRequest request) {
         logger.info("Received start game request: " + request);
         GenericGame game = new GenericGame(helper, helper.constructGame(request.getGameConfig()), tokenGenerator);
         games.put(game.getUUID(), game);

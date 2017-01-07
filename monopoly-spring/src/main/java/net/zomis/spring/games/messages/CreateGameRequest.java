@@ -1,6 +1,6 @@
 package net.zomis.spring.games.messages;
 
-public class StartGameRequest {
+public class CreateGameRequest {
 
     private String playerName;
     private String password;

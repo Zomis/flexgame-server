@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.zomis.spring.games.messages.StartGameRequest;
+import net.zomis.spring.games.messages.CreateGameRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +63,7 @@ public class GamesControllerTest {
 
 	@Test
 	public void createGameRequestShouldCreateGame() throws Exception {
-        StartGameRequest request = new StartGameRequest();
+        CreateGameRequest request = new CreateGameRequest();
         request.setPlayerName("Zomis");
 /*        MonopolyConfig config = new MonopolyConfig();
         request.setSpeedDie(true);*/
