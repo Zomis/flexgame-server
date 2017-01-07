@@ -76,14 +76,15 @@ public class GameRestDelegate {
 
     public ResponseEntity<GameMoveResult> action(String gameUUID, String authToken,
             String actionType, JsonNode jsonNode) {
-        logger.info("Received action request of type '" + actionType + "' in game " + gameUUID);
+        logger.info("Received action request of type '" + actionType + "' in game " + gameUUID + ": " + jsonNode);
         Optional<GenericGame> game = getGame(UUID.fromString(gameUUID));
         if (!game.isPresent()) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(new GameMoveResult("Game not found"));
         }
         Optional<PlayerInGame> player = game.get().authorize(authToken);
         if (!player.isPresent()) {
-            return ResponseEntity.badRequest().body(null);
+            logger.warn("No player found with " + authToken + " in game " + game);
+            return ResponseEntity.badRequest().body(new GameMoveResult("Player in game not found"));
         }
         GameMoveResult result = helper.performAction(player.get().getIndex(), jsonNode);
         return ResponseEntity.ok(result);

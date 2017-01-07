@@ -3,6 +3,8 @@ package net.zomis.spring.games.generic;
 import net.zomis.spring.games.messages.GameInfo;
 import net.zomis.spring.games.messages.JoinGameResponse;
 import net.zomis.spring.games.messages.StartGameResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class GenericGame {
 
+    private static final Logger logger = LoggerFactory.getLogger(GenericGame.class);
     private final GameHelper gameHelper;
     private final UUID uuid;
     private final Object object;
@@ -46,6 +49,7 @@ public class GenericGame {
             playerKeys.add(new PlayerInGame(playerName, playerKeys.size() - 1,
                 token, object));
         }
+        logger.info("Added player to game: " + this + " keys are now: " + playerKeys);
 
         return ResponseEntity.ok(new JoinGameResponse(playerKey));
     }

@@ -25,4 +25,15 @@ public class PlayerInGame {
     public boolean hasToken(String authToken) {
         return this.authToken.equals(authToken);
     }
+
+    @Override
+    public String toString() {
+        return "PlayerInGame{" +
+                "name='" + name + '\'' +
+                ", index=" + index +
+                ", authToken='" + authToken + '\'' +
+//                ", game=" + game +
+                '}';
+    }
+
 }
