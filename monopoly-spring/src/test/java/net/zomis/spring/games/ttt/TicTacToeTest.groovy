@@ -75,6 +75,10 @@ class TicTacToeTest {
             assert it.status == 'ok'
         }
 
+        test.get("games/ttt/$gameId/details").with {
+            assert it.turn == 'O'
+            assert it.state == [[null,null,null], [null,'X',null], [null,null,null]];
+        }
     }
 
 }

@@ -7,6 +7,7 @@ import java.util.function.Function;
 public class GroovyGameHelper implements GameHelper<Object, Object> {
 
     public Function<Object, Object> constructor;
+    public Function<Object, Object> details;
 
     @Override
     public Object constructGame(Object configuration) {
@@ -30,7 +31,7 @@ public class GroovyGameHelper implements GameHelper<Object, Object> {
 
     @Override
     public Object gameDetails(Object game) {
-        return null;
+        return details.apply(game);
     }
 
 }

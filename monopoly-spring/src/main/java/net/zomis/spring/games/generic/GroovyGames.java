@@ -1,5 +1,7 @@
 package net.zomis.spring.games.generic;
 
+import groovy.json.JsonBuilder;
+import groovy.json.JsonSlurper;
 import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import groovy.util.DelegatingScript;
@@ -96,6 +98,18 @@ public class GroovyGames {
 
         public void gameInfo(Closure<?> closure) {
             this.gameInfo = closure;
+            helper.details = game -> {
+                System.out.println("game is " + game);
+                Closure<?> buildClosure = (Closure<?>) closure.call(game);
+
+                JsonBuilder builder = new JsonBuilder();
+                builder.call(buildClosure);
+
+                String result = builder.toPrettyString();
+                System.out.println(result);
+                JsonSlurper slurper = new JsonSlurper();
+                return slurper.parseText(result);
+            };
         }
 
     }

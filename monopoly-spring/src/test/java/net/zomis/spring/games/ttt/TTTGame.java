@@ -1,5 +1,7 @@
 package net.zomis.spring.games.ttt;
 
+import java.util.Arrays;
+
 enum TTPlayer {
     X, O;
 }
@@ -18,6 +20,16 @@ public class TTTGame {
     public void move(TTPlayer who, int x, int y) {
         board[y][x] = who;
         moves++;
+    }
+
+    public TTPlayer[][] getBoard() {
+        return Arrays.stream(board)
+            .map(b -> Arrays.copyOf(b, b.length))
+            .toArray(TTPlayer[][]::new);
+    }
+
+    public TTPlayer getTurn() {
+        return TTPlayer.values()[moves % 2];
     }
 
 }

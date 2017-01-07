@@ -19,4 +19,11 @@ game("ttt", TTTGame.class) {
         }
     }
 
+    gameInfo {TTTGame game ->
+        return {
+            turn game.getTurn()
+            board game.getBoard()
+        }
+    }
+
 }
