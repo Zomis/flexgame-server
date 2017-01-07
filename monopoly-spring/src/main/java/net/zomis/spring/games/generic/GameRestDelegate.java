@@ -89,4 +89,10 @@ public class GameRestDelegate {
         return ResponseEntity.ok(result);
     }
 
+    public ResponseEntity<StartGameResponse> start(String game) {
+        Optional<GenericGame> theGame = getGame(UUID.fromString(game));
+        theGame.get().start();
+        return ResponseEntity.ok(new StartGameResponse(true));
+    }
+
 }

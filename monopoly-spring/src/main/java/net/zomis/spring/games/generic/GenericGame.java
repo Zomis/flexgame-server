@@ -2,6 +2,7 @@ package net.zomis.spring.games.generic;
 
 import net.zomis.spring.games.messages.GameInfo;
 import net.zomis.spring.games.messages.JoinGameResponse;
+import net.zomis.spring.games.messages.StartGameResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;
@@ -61,6 +62,10 @@ public class GenericGame {
         return playerKeys.stream()
             .filter(e -> e.hasToken(authToken))
             .findFirst();
+    }
+
+    public StartGameResponse start() {
+        return new StartGameResponse(true);
     }
 
 }
