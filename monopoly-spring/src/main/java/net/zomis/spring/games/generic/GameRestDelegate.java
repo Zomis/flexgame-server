@@ -6,7 +6,7 @@ import net.zomis.spring.games.messages.GameList;
 import net.zomis.spring.games.messages.JoinGameResponse;
 import net.zomis.spring.games.messages.GameMoveResult;
 import net.zomis.spring.games.messages.GameInfo;
-import net.zomis.spring.games.monopoly.messages.JoinGameRequest;
+import net.zomis.spring.games.messages.JoinGameRequest;
 import net.zomis.spring.games.messages.StartGameRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class GameRestDelegate {
         if (!game.isPresent()) {
             return ResponseEntity.badRequest().body(null);
         }
-        return game.get().addPlayer(request.getPlayerName(), request.getPiece());
+        return game.get().addPlayer(request.getPlayerName(), request.getPlayerConfig());
     }
 
     public ResponseEntity<GameInfo> summary(String uuid) {

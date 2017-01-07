@@ -1,24 +1,24 @@
-package net.zomis.spring.games.monopoly.messages;
+package net.zomis.spring.games.messages;
 
 public class JoinGameRequest {
 
     private String playerName;
-    private String piece;
+    private Object playerConfig;
 
     public String getPlayerName() {
         return playerName;
     }
 
-    public String getPiece() {
-        return piece;
+    public Object getPlayerConfig() {
+        return playerConfig;
     }
 
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
 
-    public void setPiece(String piece) {
-        this.piece = piece;
+    public void setPlayerConfig(Object playerConfig) {
+        this.playerConfig = playerConfig;
     }
 
 }
