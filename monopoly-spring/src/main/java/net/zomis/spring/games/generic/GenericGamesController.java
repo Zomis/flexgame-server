@@ -44,7 +44,7 @@ public class GenericGamesController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        games.initialize(new InputStreamReader(resourceLoader.getResource("classpath:monopoly.groovy").getInputStream()));
+        games.initialize(new InputStreamReader(resourceLoader.getResource("classpath:net/zomis/spring/games/monopoly.groovy").getInputStream()));
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)

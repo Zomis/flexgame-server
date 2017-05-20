@@ -1,3 +1,5 @@
+package net.zomis.spring.games
+
 import net.zomis.monopoly.model.Game
 import net.zomis.monopoly.model.GameSetup
 import net.zomis.monopoly.model.MonopolyConfig

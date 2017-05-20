@@ -28,6 +28,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="monopoly" target="1.5" />
       <module name="monopoly-model" target="1.8" />
       <module name="monopoly-spring" target="1.8" />
     </bytecodeTargetLevel>

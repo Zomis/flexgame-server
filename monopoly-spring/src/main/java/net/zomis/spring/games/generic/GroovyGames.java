@@ -1,9 +1,11 @@
 package net.zomis.spring.games.generic;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import groovy.json.JsonBuilder;
 import groovy.json.JsonSlurper;
 import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
+import groovy.transform.CompileStatic;
 import groovy.util.DelegatingScript;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
@@ -55,6 +57,7 @@ public class GroovyGames {
         return this.games.get(name);
     }
 
+    @CompileStatic
     private static class GroovyGameDelegate {
         private int minPlayers;
         private int maxPlayers;
@@ -71,7 +74,10 @@ public class GroovyGames {
 
         public void setup(Class<?> gameConfigClass, Closure<?> closure) {
             this.gameConfigClass = gameConfigClass;
-            helper.constructor = closure::call;
+            helper.constructor = obj -> {
+                Object converted = new ObjectMapper().convertValue(obj, gameConfigClass);
+                return closure.call(converted);
+            };
         }
 
         public void playerType(Class<?> playerConfigClass) {
