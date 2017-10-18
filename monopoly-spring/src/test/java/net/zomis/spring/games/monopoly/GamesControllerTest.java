@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import net.zomis.monopoly.model.MonopolyConfig;
 import net.zomis.spring.games.messages.CreateGameRequest;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,13 +66,14 @@ public class GamesControllerTest {
 	public void createGameRequestShouldCreateGame() throws Exception {
         CreateGameRequest request = new CreateGameRequest();
         request.setPlayerName("Zomis");
-/*        MonopolyConfig config = new MonopolyConfig();
-        request.setSpeedDie(true);*/
+        MonopolyConfig config = new MonopolyConfig();
+        config.speedDie = true;
+        request.setGameConfig(config);
 
 		this.mockMvc.perform(postRequest("/games/monopoly", request))
             .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.uuid").isString());
+            .andExpect(status().is(201))
+            .andExpect(jsonPath("$.gameId").isString());
 	}
 
     private RequestBuilder postRequest(String url, Object request) throws JsonProcessingException {
