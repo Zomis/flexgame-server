@@ -1,4 +1,4 @@
-package net.zomis.spring.games.monopoly;
+package net.zomis.spring.games;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,7 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GamesControllerTest {
+public class GamesControllerMonopolyBasicTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
