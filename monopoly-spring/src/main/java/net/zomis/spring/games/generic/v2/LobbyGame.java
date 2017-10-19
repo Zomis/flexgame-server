@@ -47,6 +47,10 @@ public class LobbyGame<G> {
         return gameConfiguration;
     }
 
+    public List<PlayerInGame> getPlayers() {
+        return playerKeys;
+    }
+
     public RunningGame<G> startGame() {
         G game = gameHelper.startGame(this);
         return new RunningGame<>(this.gameHelper, tokenGenerator.generateToken(), game);

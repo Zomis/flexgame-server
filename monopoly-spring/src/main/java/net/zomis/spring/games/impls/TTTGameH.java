@@ -25,7 +25,10 @@ public class TTTGameH implements GameHelper2<TTTGame> {
 
     @Override
     public ActionResult playerJoin(LobbyGame<TTTGame> game, Object playerConfiguration) {
-        return new ActionResult(true, "OK");
+        if (game.getPlayers().size() < 2) {
+            return new ActionResult(true, "OK");
+        }
+        return new ActionResult(false, "Game is full");
     }
 
     @Override
