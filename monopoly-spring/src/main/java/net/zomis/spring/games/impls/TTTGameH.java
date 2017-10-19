@@ -33,6 +33,9 @@ public class TTTGameH implements GameHelper2<TTTGame> {
 
     @Override
     public TTTGame startGame(LobbyGame<TTTGame> lobbyGame) {
+        if (lobbyGame.getPlayers().size() != 2) {
+            return null;
+        }
         // TODO: ? lobbyGame.shufflePlayerOrder();
         TTTGame gameObj = new TTTGame();
         return gameObj;
