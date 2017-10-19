@@ -65,7 +65,7 @@ public class LobbyGame<G> {
 
     public RunningGame<G> startGame() {
         G game = gameHelper.startGame(this);
-        return new RunningGame<>(this.gameHelper, tokenGenerator.generateToken(), game);
+        return new RunningGame<>(this.gameHelper, this.id, this.playerKeys, game);
     }
 
 

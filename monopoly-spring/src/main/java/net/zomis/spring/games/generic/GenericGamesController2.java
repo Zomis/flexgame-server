@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zomis.spring.games.generic.v2.ActionResult;
 import net.zomis.spring.games.generic.v2.GameHelper2;
+import net.zomis.spring.games.impls.TTTGameH;
 import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/games2")
-public class GenericGamesController2 {
+public class GenericGamesController2 implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(GenericGamesController2.class);
 
@@ -97,4 +98,8 @@ public class GenericGamesController2 {
         return result;
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        addGame("ttt", new TTTGameH());
+    }
 }

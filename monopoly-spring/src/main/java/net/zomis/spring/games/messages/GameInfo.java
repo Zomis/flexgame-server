@@ -31,7 +31,7 @@ public class GameInfo {
         return lastActivity;
     }
 
-    public String getUuid() {
+    public String getId() {
         return id;
     }
 

@@ -21,4 +21,11 @@ public class JoinGameRequest {
         this.playerConfig = playerConfig;
     }
 
+    @Override
+    public String toString() {
+        return "JoinGameRequest{" +
+                "playerName='" + playerName + '\'' +
+                ", playerConfig=" + playerConfig +
+                '}';
+    }
 }

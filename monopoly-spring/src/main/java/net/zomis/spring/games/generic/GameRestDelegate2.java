@@ -59,7 +59,7 @@ public class GameRestDelegate2<G> {
         logger.info("Received join game request: " + request);
         Optional<LobbyGame<G>> game = getLobbyGame(gameID);
         if (!game.isPresent()) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         JoinGameResponse joinResponse = game.get().joinRequest(request.getPlayerName(), request.getPlayerConfig());
         if (joinResponse == null) {
@@ -71,7 +71,7 @@ public class GameRestDelegate2<G> {
     public ResponseEntity<GameInfo> summary(String uuid) {
         Optional<GameInfo> lobby = Optional.ofNullable(lobbyGames.get(uuid)).map(LobbyGame::getGameInfo);
         Optional<GameInfo> running = Optional.ofNullable(runningGames.get(uuid)).map(RunningGame::getGameInfo);
-        Optional<GameInfo> info = Stream.of(lobby, running).findAny().filter(Optional::isPresent).map(Optional::get);
+        Optional<GameInfo> info = Stream.of(lobby, running).filter(Optional::isPresent).findAny().map(Optional::get);
         return info.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
@@ -79,7 +79,7 @@ public class GameRestDelegate2<G> {
         logger.info("Received details request: " + uuid);
         RunningGame<G> game = runningGames.get(uuid);
         if (game == null) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(game.getGameDetails());
     }

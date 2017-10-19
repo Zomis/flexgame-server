@@ -15,12 +15,13 @@ public class RunningGame<G> {
     private final GameHelper2<G> gameHelper;
     private final String id;
     private final G game;
-    private final List<PlayerInGame> playerKeys = Collections.synchronizedList(new ArrayList<>());
+    private final List<PlayerInGame> playerKeys;
     private long lastActivity;
 
-    public RunningGame(GameHelper2<G> gameHelper, String id, G game) {
+    public RunningGame(GameHelper2<G> gameHelper, String id, List<PlayerInGame> players, G game) {
         this.gameHelper = gameHelper;
         this.id = id;
+        this.playerKeys = Collections.synchronizedList(new ArrayList<>(players));
         this.game = game;
     }
 

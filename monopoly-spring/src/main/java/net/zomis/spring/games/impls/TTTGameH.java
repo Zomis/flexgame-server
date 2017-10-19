@@ -1,6 +1,10 @@
 package net.zomis.spring.games.impls;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
@@ -68,6 +72,21 @@ public class TTTGameH implements GameHelper2<TTTGame> {
 
     @Override
     public Object gameDetails(RunningGame<TTTGame> game, PlayerInGame fromWhosPerspective) {
-        return null;
+        JsonNodeFactory nodeFactory = new JsonNodeFactory(false);
+        ArrayNode node = nodeFactory.arrayNode(3);
+        TTTGame board = game.getGame();
+        for (int y = 0; y < 3; y++) {
+            ArrayNode row = nodeFactory.arrayNode(3);
+            for (int x = 0; x < 3; x++) {
+                TTPlayer value = board.getBoard()[y][x];
+                if (value != null) {
+                    row.add(value.name());
+                } else {
+                    row.addNull();
+                }
+            }
+            node.add(row);
+        }
+        return node;
     }
 }
