@@ -1,4 +1,4 @@
-package net.zomis.spring.games.ttt;
+package net.zomis.spring.games.impls;
 
 import java.util.Arrays;
 
