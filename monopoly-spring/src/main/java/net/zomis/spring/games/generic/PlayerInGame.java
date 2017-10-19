@@ -5,13 +5,11 @@ public class PlayerInGame {
     private final String name;
     private final int index;
     private final String authToken;
-    private final Object game;
 
-    public PlayerInGame(String name, int index, String authToken, Object game) {
+    public PlayerInGame(String name, int index, String authToken) {
         this.name = name;
         this.index = index;
         this.authToken = authToken;
-        this.game = game;
     }
 
     public String getName() {
@@ -20,10 +18,6 @@ public class PlayerInGame {
 
     public int getIndex() {
         return index;
-    }
-
-    public Object getGame() {
-        return game;
     }
 
     public boolean hasToken(String authToken) {

@@ -43,8 +43,8 @@ public class GameRestDelegate {
         games.put(game.getUUID(), game);
 
         ResponseEntity<JoinGameResponse> joinResponse = game.addPlayer(request.getPlayerName(), request.getPlayerConfig());
-        CreateGameResponse response = new CreateGameResponse(game.getUUID(),
-            UUID.fromString(joinResponse.getBody().getPrivateKey()));
+        CreateGameResponse response = new CreateGameResponse(game.getUUID().toString(),
+            joinResponse.getBody().getPrivateKey());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

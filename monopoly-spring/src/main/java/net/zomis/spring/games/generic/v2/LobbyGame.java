@@ -26,15 +26,27 @@ public class LobbyGame<G> {
         this.gameConfiguration = gameConfiguration;
     }
 
-    public JoinGameResponse joinRequest(Object playerConfiguration) {
+    public String getId() {
+        return id;
+    }
+
+    public JoinGameResponse joinRequest(String playerName, Object playerConfiguration) {
         ActionResult joinResult = gameHelper.playerJoin(this, playerConfiguration);
         if (joinResult.isOk()) {
             String privateKey = tokenGenerator.generateToken();
+            addPlayer(playerName, privateKey, playerConfiguration);
             return new JoinGameResponse(privateKey);
         } else {
             // TODO: Handle this gracefully. Return correct HTTP Status, with message explaining why.
+            // Could possibly return an ActionResult here
             return new JoinGameResponse((String) null);
         }
+    }
+
+    private void addPlayer(String playerName, String privateKey, Object playerConfiguration) {
+        // TODO: Store player configuration in PlayerInGame object probably
+        PlayerInGame pig = new PlayerInGame(playerName, playerKeys.size(), privateKey);
+        this.playerKeys.add(pig);
     }
 
     public GameInfo getGameInfo() {

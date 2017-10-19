@@ -7,6 +7,7 @@ import net.zomis.spring.games.messages.GameMoveResult;
 import java.util.Map;
 import java.util.function.Function;
 
+@Deprecated
 public class GroovyGameHelper implements GameHelper<Object, Object> {
 
     public Function<Object, Object> constructor;
@@ -33,7 +34,7 @@ public class GroovyGameHelper implements GameHelper<Object, Object> {
     public GameMoveResult performAction(PlayerInGame playerInGame, String actionType, TreeNode data) {
         GroovyGames.GroovyAction action = actions.get(actionType);
         Object actionData = new ObjectMapper().convertValue(data, action.parameter);
-        action.perform.call(new Action(playerInGame, actionData));
+        action.perform.call(new Action(null, playerInGame, actionData));
         return new GameMoveResult("ok");
     }
 

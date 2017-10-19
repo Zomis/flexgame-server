@@ -2,10 +2,12 @@ package net.zomis.spring.games.generic.v2;
 
 import net.zomis.spring.games.generic.GenericGame;
 import net.zomis.spring.games.generic.PlayerInGame;
+import net.zomis.spring.games.messages.GameInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RunningGame<G> {
 
@@ -14,6 +16,7 @@ public class RunningGame<G> {
     private final String id;
     private final G game;
     private final List<PlayerInGame> playerKeys = Collections.synchronizedList(new ArrayList<>());
+    private long lastActivity;
 
     public RunningGame(GameHelper2<G> gameHelper, String id, G game) {
         this.gameHelper = gameHelper;
@@ -21,7 +24,24 @@ public class RunningGame<G> {
         this.game = game;
     }
 
+    public GameInfo getGameInfo() {
+        return new GameInfo(id, playerKeys.stream().map(PlayerInGame::getName).collect(Collectors.toList()),
+            lastActivity, playerKeys.size(), true);
+    }
+
+    public Object getGameDetails() {
+        // TODO: Add support for passing from who's perspective (Needed for games with private information)
+        return gameHelper.gameDetails(this, null);
+    }
+
     public G getGame() {
         return game;
     }
+
+    public Optional<PlayerInGame> authorize(String authToken) {
+        return playerKeys.stream()
+                .filter(e -> e.hasToken(authToken))
+                .findFirst();
+    }
+
 }

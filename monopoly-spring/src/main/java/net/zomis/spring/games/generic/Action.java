@@ -6,9 +6,9 @@ public class Action {
     private final int playerIndex;
     private final Object actionData;
 
-    public Action(PlayerInGame playerInGame, Object actionData) {
-        this.game = playerInGame.getGame();
-        this.playerIndex = playerInGame.getIndex();
+    public Action(Object game, PlayerInGame player, Object actionData) {
+        this.game = game;
+        this.playerIndex = player.getIndex();
         this.actionData = actionData;
     }
 

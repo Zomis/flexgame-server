@@ -1,22 +1,20 @@
 package net.zomis.spring.games.messages;
 
-import java.util.UUID;
-
 public class CreateGameResponse {
 
-    private final UUID gameId;
-    private final UUID privateKey;
+    private final String gameId;
+    private final String privateKey;
 
-    public CreateGameResponse(UUID gameId, UUID privateKey) {
+    public CreateGameResponse(String gameId, String privateKey) {
         this.gameId = gameId;
         this.privateKey = privateKey;
     }
 
-    public UUID getGameId() {
+    public String getGameId() {
         return gameId;
     }
 
-    public UUID getPrivateKey() {
+    public String getPrivateKey() {
         return privateKey;
     }
 
