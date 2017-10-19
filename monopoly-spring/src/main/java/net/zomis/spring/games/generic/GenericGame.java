@@ -30,7 +30,7 @@ public class GenericGame {
     }
 
     public GameInfo getGameInfo() {
-        return new GameInfo(uuid, playerKeys.stream().map(PlayerInGame::getName).collect(Collectors.toList()),
+        return new GameInfo(uuid.toString(), playerKeys.stream().map(PlayerInGame::getName).collect(Collectors.toList()),
             Instant.now().toEpochMilli(),
             playerKeys.size(), started);
     }

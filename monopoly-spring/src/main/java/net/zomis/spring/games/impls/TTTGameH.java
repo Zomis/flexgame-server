@@ -1,6 +1,7 @@
 package net.zomis.spring.games.impls;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
 import net.zomis.spring.games.generic.v2.ActionResult;
@@ -8,13 +9,18 @@ import net.zomis.spring.games.generic.v2.GameHelper2;
 import net.zomis.spring.games.generic.v2.LobbyGame;
 import net.zomis.spring.games.generic.v2.RunningGame;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class TTTGameH implements GameHelper2<TTTGame> {
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Hashids idGenerator = new Hashids(getClass().getSimpleName());
+    private final AtomicInteger gameId = new AtomicInteger();
 
     @Override
     public LobbyGame<TTTGame> createGame(Object gameConfiguration) {
-        return new LobbyGame<>(new TokenGenerator(), this, gameConfiguration);
+        String id = idGenerator.encrypt(gameId.incrementAndGet());
+        return new LobbyGame<>(id, new TokenGenerator(), this, gameConfiguration);
     }
 
     @Override

@@ -5,14 +5,14 @@ import java.util.UUID;
 
 public class GameInfo {
 
-    private final UUID uuid;
+    private final String id;
     private final List<String> players;
     private final long lastActivity;
     private final int maxPlayers;
     private final boolean started;
 
-    public GameInfo(UUID uuid, List<String> players, long lastActivity, int maxPlayers, boolean started) {
-        this.uuid = uuid;
+    public GameInfo(String id, List<String> players, long lastActivity, int maxPlayers, boolean started) {
+        this.id = id;
         this.players = players;
         this.lastActivity = lastActivity;
         this.maxPlayers = maxPlayers;
@@ -31,8 +31,8 @@ public class GameInfo {
         return lastActivity;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public String getUuid() {
+        return id;
     }
 
     public boolean isStarted() {

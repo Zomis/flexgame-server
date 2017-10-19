@@ -2,7 +2,6 @@ package net.zomis.spring.games.generic.v2;
 
 import net.zomis.spring.games.generic.GenericGame;
 import net.zomis.spring.games.generic.PlayerInGame;
-import net.zomis.spring.games.generic.v2.GameHelper2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
