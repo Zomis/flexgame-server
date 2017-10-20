@@ -96,7 +96,14 @@ class TTTV2Test {
 
     @Test
     public void illegalMove() {
-
+        def game = startGame()
+        // Play moves
+        def move1 = "games2/ttt/$game.gameKey/actions/move?token=$game.p1key"
+        def move2 = "games2/ttt/$game.gameKey/actions/move?token=$game.p2key"
+        move(move1, 0, 0)
+        def failedMove = test.post(move2, { x 0; y 0 })
+        assert !failedMove.ok
+        assert failedMove.status == 'Position already taken'
     }
 
 }
