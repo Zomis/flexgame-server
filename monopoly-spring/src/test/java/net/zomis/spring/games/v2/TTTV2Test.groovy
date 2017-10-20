@@ -28,8 +28,8 @@ class TTTV2Test {
         assert result.contains('ttt')
     }
 
-    @Test
-    public void playFullGame() {
+    private def startGame() {
+        def expando = new Expando();
         def result = test.post('games2/ttt', {
             playerName 'Zomis'
         })
@@ -62,9 +62,18 @@ class TTTV2Test {
         assert result.players == ['Zomis', 'Test2']
         assert result.started == true
 
+        expando.p1key = p1key
+        expando.p2key = p2key
+        expando.gameKey = gameKey
+        return expando
+    }
+
+    @Test
+    public void playFullGame() {
+        def game = startGame()
         // Play moves
-        def move1 = "games2/ttt/$gameKey/actions/move?token=$p1key"
-        def move2 = "games2/ttt/$gameKey/actions/move?token=$p2key"
+        def move1 = "games2/ttt/$game.gameKey/actions/move?token=$game.p1key"
+        def move2 = "games2/ttt/$game.gameKey/actions/move?token=$game.p2key"
         move(move1, 0, 0)
         move(move2, 0, 1)
 
@@ -73,8 +82,8 @@ class TTTV2Test {
         move(move1, 2, 2)
         move(move2, 2, 1) // 'O' wins by horizontal center (01 11 21)
 
-        result = test.get("games2/ttt/$gameKey/details")
-        assert result
+        def result = test.get("games2/ttt/$game.gameKey/details")
+        assert result == [['X','X',null],['O', 'O', 'O'], [null, null, 'X']]
         // Game has ended
     }
 
