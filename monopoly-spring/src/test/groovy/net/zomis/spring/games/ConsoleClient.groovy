@@ -72,19 +72,24 @@ class ConsoleClient {
     }
 
     void actions() {
-        println t.get("$gamePath/details")
+        while (true) {
+            println t.get("$gamePath/details")
 
-        println "Enter action:"
-        def type = scanner.nextLine()
-        println "x"
-        def vx = scanner.nextInt()
-        println "y"
-        def vy = scanner.nextInt()
+            println "Enter action:"
+            def type = scanner.nextLine()
+            if (type.isEmpty()) {
+                break
+            }
+            println "x"
+            def vx = scanner.nextLine()
+            println "y"
+            def vy = scanner.nextLine()
 
-        def result = t.post("$gamePath/actions/$type?token=$token", {
-            x vx
-            y vy
-        })
+            def result = t.post("$gamePath/actions/$type?token=$token", {
+                x vx
+                y vy
+            })
+        }
     }
 
     static void main(String[] args) {
