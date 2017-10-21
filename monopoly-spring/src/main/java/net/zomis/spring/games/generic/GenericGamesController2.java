@@ -81,6 +81,7 @@ public class GenericGamesController2 implements InitializingBean {
 
     @RequestMapping(value = "/{gameType}/{game}/start", method = RequestMethod.POST)
     public ResponseEntity<StartGameResponse> start(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
+        // TODO: Also needs privateKey for player who created game
         return delegate(gameType).start(game);
     }
 
