@@ -69,7 +69,7 @@ public class GenericGamesController2 implements InitializingBean {
         return delegate(gameType).startNewGame(request);
     }
 
-    @RequestMapping(value = "/{gameType}/{game}/join")
+    @RequestMapping(value = "/{gameType}/{game}/join", method = RequestMethod.POST)
     public ResponseEntity<JoinGameResponse> joinGame(@PathVariable("gameType") String gameType, @PathVariable("game") String gameID, @RequestBody JoinGameRequest request) {
         return delegate(gameType).joinGame(gameID, request);
     }
