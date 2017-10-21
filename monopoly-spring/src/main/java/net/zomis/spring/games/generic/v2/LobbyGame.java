@@ -4,6 +4,8 @@ import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
 import net.zomis.spring.games.messages.GameInfo;
 import net.zomis.spring.games.messages.JoinGameResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LobbyGame<G> {
+
+    private static final Logger logger = LoggerFactory.getLogger(LobbyGame.class);
 
     private final String id;
     private final List<PlayerInGame> playerKeys = Collections.synchronizedList(new ArrayList<>());
@@ -46,6 +50,7 @@ public class LobbyGame<G> {
     private void addPlayer(String playerName, String privateKey, Object playerConfiguration) {
         // TODO: Store player configuration in PlayerInGame object probably
         PlayerInGame pig = new PlayerInGame(playerName, playerKeys.size(), privateKey);
+        logger.info("Created " + pig + " with token '" + privateKey + "' for " + this);
         this.playerKeys.add(pig);
     }
 
@@ -68,6 +73,13 @@ public class LobbyGame<G> {
         return new RunningGame<>(this.gameHelper, this.id, this.playerKeys, game);
     }
 
-
+    @Override
+    public String toString() {
+        return "LobbyGame{" +
+                "id='" + id + '\'' +
+                ", gameHelper=" + gameHelper +
+                ", gameConfiguration=" + gameConfiguration +
+                '}';
+    }
 
 }

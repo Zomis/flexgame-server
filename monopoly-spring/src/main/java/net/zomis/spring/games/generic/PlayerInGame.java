@@ -29,8 +29,6 @@ public class PlayerInGame {
         return "PlayerInGame{" +
                 "name='" + name + '\'' +
                 ", index=" + index +
-                ", authToken='" + authToken + '\'' +
-//                ", game=" + game +
                 '}';
     }
 
