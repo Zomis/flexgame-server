@@ -1,5 +1,5 @@
-import net.zomis.spring.games.ttt.TTTGame;
-import net.zomis.spring.games.ttt.TTPlayer;
+import net.zomis.spring.games.impls.TTTGame;
+import net.zomis.spring.games.impls.TTPlayer;
 import net.zomis.spring.games.generic.Action;
 
 class XYMove {

@@ -3,6 +3,7 @@ package net.zomis.spring.games.ttt
 import net.zomis.spring.games.generic.GroovyGames
 import net.zomis.spring.test.RestTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,6 +38,7 @@ class TicTacToeTest {
     }
 
     @Test
+    @Ignore // Ignored because this is using the old API which is deprecated
     void playSimpleGame() {
         def result = test.post('games/ttt', {
             playerName 'Player1'
