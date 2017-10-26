@@ -10,7 +10,7 @@
 
     <modules>
         <module>monopoly-model</module>
-        <module>monopoly-spring</module>
+        <module>flexgame-server</module>
     </modules>
     
     <build>

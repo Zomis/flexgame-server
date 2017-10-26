@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/flexgame-server/flexgame-server.iml" filepath="$PROJECT_DIR$/flexgame-server/flexgame-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/monopoly.iml" filepath="$PROJECT_DIR$/monopoly.iml" />
       <module fileurl="file://$PROJECT_DIR$/monopoly-model/monopoly-model.iml" filepath="$PROJECT_DIR$/monopoly-model/monopoly-model.iml" />
-      <module fileurl="file://$PROJECT_DIR$/monopoly-spring/monopoly-spring.iml" filepath="$PROJECT_DIR$/monopoly-spring/monopoly-spring.iml" />
     </modules>
   </component>
 </project>
