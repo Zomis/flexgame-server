@@ -38,7 +38,7 @@ public class LobbyGame<G> {
         ActionResult joinResult = gameHelper.playerJoin(this, playerConfiguration);
         if (joinResult.isOk()) {
             String privateKey = tokenGenerator.generateToken();
-            addPlayer(playerName, privateKey, playerConfiguration);
+            addPlayer(playerName, privateKey, playerConfiguration, null);
             return new JoinGameResponse(privateKey);
         } else {
             // TODO: Handle this gracefully. Return correct HTTP Status, with message explaining why.
@@ -47,9 +47,8 @@ public class LobbyGame<G> {
         }
     }
 
-    private void addPlayer(String playerName, String privateKey, Object playerConfiguration) {
-        // TODO: Store player configuration in PlayerInGame object probably
-        PlayerInGame pig = new PlayerInGame(playerName, playerKeys.size(), privateKey);
+    void addPlayer(String playerName, String privateKey, Object playerConfiguration, PlayerController controller) {
+        PlayerInGame pig = new PlayerInGame(playerName, playerKeys.size(), privateKey, playerConfiguration, controller);
         logger.info("Created " + pig + " with token '" + privateKey + "' for " + this);
         this.playerKeys.add(pig);
     }

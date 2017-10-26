@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zomis.spring.games.generic.v2.ActionResult;
 import net.zomis.spring.games.generic.v2.GameHelper2;
+import net.zomis.spring.games.generic.v2.GameRestDelegate2;
 import net.zomis.spring.games.impls.TTTGameH;
 import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
@@ -88,6 +89,17 @@ public class GenericGamesController2 implements InitializingBean {
     @RequestMapping(value = "/{gameType}/{game}", method = RequestMethod.GET)
     public ResponseEntity<GameInfo> summary(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
         return delegate(gameType).summary(game);
+    }
+
+    @RequestMapping(value = "/{gameType}/{game}/ai", method = RequestMethod.POST)
+    public ResponseEntity<ActionResult> addAI(@PathVariable("gameType") String gameType, @PathVariable("game") String game,
+             @RequestBody AIInvite aiInvite) {
+        return delegate(gameType).addAI(game, aiInvite);
+    }
+
+    @RequestMapping(value = "/{gameType}/{game}/aiMove", method = RequestMethod.GET)
+    public ResponseEntity<ActionResult> aiMove(@PathVariable("gameType") String gameType, @PathVariable("game") String game) {
+        return delegate(gameType).aiMove(game);
     }
 
     @RequestMapping(value = "/{gameType}/{game}/actions/{type}", method = RequestMethod.POST)

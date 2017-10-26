@@ -95,6 +95,66 @@ class TTTV2Test {
     }
 
     @Test
+    public void playAgainstAI() {
+        def result = test.post('games2/ttt', {
+            playerName 'Zomis'
+        })
+        assert result
+        def gameKey = result.gameId
+        def p1key = result.privateKey
+        def move1 = "games2/ttt/$gameKey/actions/move?token=$p1key"
+
+        // Setup game
+        result = test.get("games2/ttt/$gameKey")
+        assert result.id == gameKey
+        assert result.players == ['Zomis']
+        assert result.started == false
+
+        // Add an AI
+        result = test.post("games2/ttt/$gameKey/ai", {
+            aiName 'FixedMove'
+            aiSpecification {
+                moves([{x 0; y 0}, {x 1; y 1}, {x 2; y 2}])
+            }
+        })
+        assert result.ok
+
+        result = test.get("games2/ttt/$gameKey")
+        assert result.players == ['Zomis', 'FixedMove']
+
+        // Game starts
+        result = test.post("games2/ttt/$gameKey/start", {})
+        assert result.started == true
+
+        result = test.get("games2/ttt/$gameKey")
+        assert result.id == gameKey
+        assert result.players == ['Zomis', 'FixedMove']
+        assert result.started == true
+
+        // Play the game
+        result = test.get("games2/ttt/$gameKey/aiMove")
+        assert !result.ok // Not AI turn
+        move(move1, 1, 0);
+        result = test.get("games2/ttt/$gameKey/aiMove")
+        assert result.ok // AI moved at 0, 0
+
+        result = test.get("games2/ttt/$gameKey/details")
+        assert result == [['O','X',null],[null, null, null], [null, null, null]]
+
+        move(move1, 2, 0);
+        result = test.get("games2/ttt/$gameKey/aiMove")
+        assert result.ok // AI moved at 1, 1 (center)
+        result = test.get("games2/ttt/$gameKey/details")
+        assert result == [['O','X','X'],[null, 'O', null], [null, null, null]]
+
+        move(move1, 0, 1);
+        result = test.get("games2/ttt/$gameKey/aiMove")
+        assert result.ok // AI moved at 2, 2 and won
+        result = test.get("games2/ttt/$gameKey/details")
+        assert result == [['O','X','X'],['X', 'O', null], [null, null, 'O']]
+    }
+
+    @Test
     public void illegalMove() {
         def game = startGame()
         // Play moves

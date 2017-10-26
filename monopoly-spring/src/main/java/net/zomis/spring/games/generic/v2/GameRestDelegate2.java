@@ -1,10 +1,11 @@
-package net.zomis.spring.games.generic;
+package net.zomis.spring.games.generic.v2;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.zomis.spring.games.generic.v2.ActionResult;
-import net.zomis.spring.games.generic.v2.GameHelper2;
-import net.zomis.spring.games.generic.v2.LobbyGame;
-import net.zomis.spring.games.generic.v2.RunningGame;
+import net.zomis.spring.games.generic.AIInvite;
+import net.zomis.spring.games.generic.Action;
+import net.zomis.spring.games.generic.PlayerInGame;
+import net.zomis.spring.games.generic.TokenGenerator;
+import net.zomis.spring.games.generic.v2.*;
 import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,45 @@ public class GameRestDelegate2<G> {
             runningGames.put(game, running);
         }
         return ResponseEntity.ok(new StartGameResponse(true));
+    }
+
+    public ResponseEntity<ActionResult> addAI(String game, AIInvite aiInvite) {
+        Optional<LobbyGame<G>> theGame = getLobbyGame(game);
+        if (!theGame.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        LobbyGame<G> g = theGame.get();
+        Optional<PlayerController<G>> controller = helper
+            .inviteAI(g, aiInvite.getAiName(), aiInvite.getAiSpecification(), aiInvite.getPlayerConfiguration());
+        if (controller.isPresent()) {
+            g.addPlayer(aiInvite.getAiName(), null, aiInvite.getPlayerConfiguration(), controller.get());
+        }
+        ActionResult result = controller.isPresent() ? new ActionResult(true, "OK") : new ActionResult(false, "no ai created");
+        return ResponseEntity.ok(result);
+    }
+
+    public ResponseEntity<ActionResult> aiMove(String gameId) {
+        RunningGame<G> game = runningGames.get(gameId);
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        Optional<PlayerInGame> aiPlayer = game.players().filter(pig -> pig.getController() != null).findAny();
+        if (!aiPlayer.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        PlayerController<G> controller = (PlayerController<G>) aiPlayer.get().getController();
+        Optional<ActionV2> result = controller.control(game.getGame(), aiPlayer.get());
+        if (!result.isPresent()) {
+            return ResponseEntity.ok(null);
+        }
+        ActionV2 act = result.get();
+        ActionResult actionResult = helper.performAction(game, aiPlayer.get(), act.getName(), act.getActionData());
+        if (!actionResult.isOk()) {
+            logger.warn("Controller " + controller + " tried to perform illegal action: " + act + " resulting in " + actionResult);
+            return ResponseEntity.status(HttpStatus.OK).body(actionResult);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(actionResult);
     }
 
 }

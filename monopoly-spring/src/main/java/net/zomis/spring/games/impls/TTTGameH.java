@@ -8,11 +8,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
-import net.zomis.spring.games.generic.v2.ActionResult;
-import net.zomis.spring.games.generic.v2.GameHelper2;
-import net.zomis.spring.games.generic.v2.LobbyGame;
-import net.zomis.spring.games.generic.v2.RunningGame;
+import net.zomis.spring.games.generic.v2.*;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TTTGameH implements GameHelper2<TTTGame> {
@@ -33,6 +31,18 @@ public class TTTGameH implements GameHelper2<TTTGame> {
             return new ActionResult(true, "OK");
         }
         return new ActionResult(false, "Game is full");
+    }
+
+    @Override
+    public Optional<PlayerController<TTTGame>> inviteAI(LobbyGame<TTTGame> game, String aiName, Object aiConfig, Object playerConfiguration) {
+        if (game.getPlayers().size() >= 2) {
+            return Optional.empty();
+        }
+
+        if (aiName.equals("FixedMove")) {
+            return Optional.of(new FixedMoveTTTAI(aiConfig));
+        }
+        return Optional.empty();
     }
 
     @Override

@@ -18,4 +18,11 @@ public class ActionResult {
         return status;
     }
 
+    @Override
+    public String toString() {
+        return "ActionResult{" +
+                "ok=" + ok +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

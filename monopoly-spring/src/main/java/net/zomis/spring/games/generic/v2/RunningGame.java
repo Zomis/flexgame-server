@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RunningGame<G> {
 
@@ -33,6 +34,10 @@ public class RunningGame<G> {
     public Object getGameDetails() {
         // TODO: Add support for passing from who's perspective (Needed for games with private information)
         return gameHelper.gameDetails(this, null);
+    }
+
+    public Stream<PlayerInGame> players() {
+        return playerKeys.stream();
     }
 
     public G getGame() {
