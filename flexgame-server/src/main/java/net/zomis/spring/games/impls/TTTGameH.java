@@ -1,10 +1,8 @@
 package net.zomis.spring.games.impls;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
