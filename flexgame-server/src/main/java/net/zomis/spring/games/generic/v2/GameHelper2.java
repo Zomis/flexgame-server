@@ -25,11 +25,11 @@ public interface GameHelper2<G> {
     /**
      * Validate Lobby game (number of players specifically) and return created game
      *
-     * @param game LobbyGame that wants to be started
+     * @param lobbyGame LobbyGame that wants to be started
      * @return Game that was created, or null if game was not allowed to be started
      */
     // TODO: Use Either<G, String> or something to return failure status
-    G startGame(LobbyGame<G> game);
+    G startGame(LobbyGame<G> lobbyGame);
     ActionResult performAction(RunningGame<G> game, PlayerInGame player, String actionType, Object actionData);
     Object gameSummary(RunningGame<G> game);
     Object gameDetails(RunningGame<G> game, PlayerInGame fromWhosPerspective);
