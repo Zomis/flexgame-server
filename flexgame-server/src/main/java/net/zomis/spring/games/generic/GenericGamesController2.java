@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zomis.spring.games.generic.v2.ActionResult;
 import net.zomis.spring.games.generic.v2.GameHelper2;
 import net.zomis.spring.games.generic.v2.GameRestDelegate2;
+import net.zomis.spring.games.impls.RoyalGameOfUrHelper;
 import net.zomis.spring.games.impls.TTTGameH;
 import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
@@ -114,5 +115,6 @@ public class GenericGamesController2 implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         addGame("ttt", new TTTGameH());
+        addGame("ur", new RoyalGameOfUrHelper());
     }
 }
