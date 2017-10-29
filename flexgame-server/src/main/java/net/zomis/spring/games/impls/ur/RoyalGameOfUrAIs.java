@@ -84,13 +84,6 @@ public class RoyalGameOfUrAIs {
         }
     }
 
-    public static final SimpleScorer<RoyalGameOfUr, Integer> knockoutBuggy = new SimpleScorer<>((i, params) -> {
-        RoyalGameOfUr ur = params.getParameters();
-        int cp = ur.getCurrentPlayer();
-        int opponent = (cp + 1) % 2;
-        int next = ur.getPieces()[cp][i] + ur.getRoll();
-        return ur.playerOccupies(opponent, next) ? 1 : 0;
-    });
     public static final SimpleScorer<RoyalGameOfUr, Integer> knockout = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
@@ -103,27 +96,11 @@ public class RoyalGameOfUrAIs {
         int cp = ur.getCurrentPlayer();
         return ur.getPieces()[cp][i];
     });
-    public static final SimpleScorer<RoyalGameOfUr, Integer> numPiecesInGame = new SimpleScorer<>((i, params) -> {
-        RoyalGameOfUr ur = params.getParameters();
-        int cp = ur.getCurrentPlayer();
-        int position = ur.getPieces()[cp][i] + ur.getRoll();
-        if (position != 0) {
-            return 0;
-        }
-        long count = Arrays.stream(ur.getPieces()[cp]).filter(pos -> pos > 0 && pos < RoyalGameOfUr.EXIT).count();
-        return (int) count;
-    });
     public static final SimpleScorer<RoyalGameOfUr, Integer> leaveFlower = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
         int position = ur.getPieces()[cp][i];
         return ur.isFlower(position) ? 1 : 0;
-    });
-    public static final SimpleScorer<RoyalGameOfUr, Integer> leavePolePosition = new SimpleScorer<>((i, params) -> {
-        RoyalGameOfUr ur = params.getParameters();
-        int cp = ur.getCurrentPlayer();
-        int position = ur.getPieces()[cp][i];
-        return position == 8 ? 1 : 0;
     });
     public static final SimpleScorer<RoyalGameOfUr, Integer> gotoSafety = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();

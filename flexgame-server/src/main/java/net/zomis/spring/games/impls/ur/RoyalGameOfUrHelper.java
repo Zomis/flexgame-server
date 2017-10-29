@@ -39,10 +39,6 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
 
     @Override
     public Optional<PlayerController<RoyalGameOfUr>> inviteAI(LobbyGame<RoyalGameOfUr> game, String aiName, Object aiConfig, Object playerConfiguration) {
-        if (aiName.equals("KnockoutFlowerExit")) {
-            RoyalGameOfUrAIs.URScorer ai = new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower).withScorer(exit));
-            return Optional.of(ai);
-        }
         if (aiName.equals("KFE521S3")) {
             URScorer ai = new URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
                     .withScorer(knockout, 5)
@@ -60,10 +56,6 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
                     .withScorer(gotoSafety, 0.1)
                     .withScorer(leaveSafety, -0.1)
                     .withScorer(exit));
-            return Optional.of(ai);
-        }
-        if (aiName.equals("KnockoutFlower")) {
-            RoyalGameOfUrAIs.URScorer ai = new RoyalGameOfUrAIs.URScorer("KnockoutFlower", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower));
             return Optional.of(ai);
         }
         return Optional.empty();

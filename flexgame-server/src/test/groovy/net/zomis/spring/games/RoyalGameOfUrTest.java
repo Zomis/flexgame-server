@@ -34,18 +34,6 @@ public class RoyalGameOfUrTest {
     public void fight() {
         GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
-                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerOld", RoyalGameOfUrAIs.scf().withScorer(knockoutBuggy).withScorer(gotoFlower)),
-                new RoyalGameOfUrAIs.URScorer("KFE521 Safety", RoyalGameOfUrAIs.scf()
-                        .withScorer(knockout, 5)
-                        .withScorer(gotoFlower, 2)
-                        .withScorer(gotoSafety, 0.1)
-                        .withScorer(exit)),
-                new RoyalGameOfUrAIs.URScorer("KFE521S2", RoyalGameOfUrAIs.scf()
-                        .withScorer(knockout, 5)
-                        .withScorer(gotoFlower, 2)
-                        .withScorer(gotoSafety, 0.1)
-                        .withScorer(leaveSafety, -0.1)
-                        .withScorer(exit)),
                 new RoyalGameOfUrAIs.URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
@@ -53,7 +41,13 @@ public class RoyalGameOfUrTest {
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -0.1)
                         .withScorer(exit)),
-                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit521", RoyalGameOfUrAIs.scf().withScorer(knockout, 5).withScorer(gotoFlower, 2).withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KFE521S3C", RoyalGameOfUrAIs.scf()
+                        .withScorer(knockout, 5)
+                        .withScorer(gotoFlower, 2)
+                        .withScorer(gotoSafety, 0.1)
+                        .withScorer(leaveSafety, -0.1)
+                        .withScorer(riskOfBeingTaken, -3)
+                        .withScorer(exit)),
         };
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
         FightInterface<RoyalGameOfUrAIs.AI> strat = new FightInterface<RoyalGameOfUrAIs.AI>() {
