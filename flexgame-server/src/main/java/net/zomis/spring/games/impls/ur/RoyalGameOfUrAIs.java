@@ -40,15 +40,17 @@ public class RoyalGameOfUrAIs {
             return scoreParameters.getParameters().canMove(currentPlayer, position, ur.getRoll());
         }
     };
+    public static ScoreConfigFactory<RoyalGameOfUr, Integer> scf() {
+        return new ScoreConfigFactory<>();
+    }
+
     public static class URScorer implements AI {
 
         private final String name;
         FieldScoreProducer<RoyalGameOfUr, Integer> producer;
-        public URScorer(String name, List<ScoreInterface<RoyalGameOfUr, Integer>> scorers) {
-            List<SimpleScorer<RoyalGameOfUr, Integer>> fscorers = scorers.stream().map(SimpleScorer::new).collect(Collectors.toList());
-            ScoreConfigFactory<RoyalGameOfUr, Integer> scf = new ScoreConfigFactory<>();
-            fscorers.forEach(scf::withScorer);
-            producer = new FieldScoreProducer<>(scf.build(), scoreStrategy);
+
+        public URScorer(String name, ScoreConfigFactory<RoyalGameOfUr, Integer> scoreConfig) {
+            producer = new FieldScoreProducer<>(scoreConfig.build(), scoreStrategy);
             this.name = name;
         }
 
@@ -76,25 +78,25 @@ public class RoyalGameOfUrAIs {
         }
     }
 
-    public static final ScoreInterface<RoyalGameOfUr, Integer> knockout = (i, params) -> {
+    public static final SimpleScorer<RoyalGameOfUr, Integer> knockout = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
         int opponent = (cp + 1) % 2;
         int next = ur.getPieces()[cp][i] + ur.getRoll();
         return ur.playerOccupies(opponent, next) ? 1 : 0;
-    };
-    public static final ScoreInterface<RoyalGameOfUr, Integer> exit = (i, params) -> {
+    });
+    public static final SimpleScorer<RoyalGameOfUr, Integer> exit = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
         int next = ur.getPieces()[cp][i] + ur.getRoll();
         return next == RoyalGameOfUr.EXIT ? 1 : 0;
-    };
-    public static final ScoreInterface<RoyalGameOfUr, Integer> gotoFlower = (i, params) -> {
+    });
+    public static final SimpleScorer<RoyalGameOfUr, Integer> gotoFlower = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
         int next = ur.getPieces()[cp][i] + ur.getRoll();
         return ur.isFlower(next) ? 1 : 0;
-    };
+    });
 
 
 }

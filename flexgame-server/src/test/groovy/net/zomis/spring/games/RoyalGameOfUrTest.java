@@ -42,11 +42,11 @@ public class RoyalGameOfUrTest {
     public void fight() {
         GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
-                new RoyalGameOfUrAIs.URScorer("Idiot", Collections.emptyList()),
-                new RoyalGameOfUrAIs.URScorer("Knockout", Arrays.asList(knockout)),
-                new RoyalGameOfUrAIs.URScorer("KnockoutFlower", Arrays.asList(knockout, gotoFlower)),
-                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit", Arrays.asList(knockout, gotoFlower, exit)),
-                new RoyalGameOfUrAIs.URScorer("FlowerExit", Arrays.asList(gotoFlower, exit)),
+                new RoyalGameOfUrAIs.URScorer("Idiot", RoyalGameOfUrAIs.scf()),
+                new RoyalGameOfUrAIs.URScorer("Knockout", RoyalGameOfUrAIs.scf().withScorer(knockout)),
+                new RoyalGameOfUrAIs.URScorer("KnockoutFlower", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower)),
+                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower).withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("FlowerExit", RoyalGameOfUrAIs.scf().withScorer(gotoFlower).withScorer(exit)),
         };
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
         FightInterface<RoyalGameOfUrAIs.AI> strat = new FightInterface<RoyalGameOfUrAIs.AI>() {
