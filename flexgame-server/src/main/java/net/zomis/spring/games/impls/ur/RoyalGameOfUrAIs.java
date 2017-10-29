@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -115,6 +116,18 @@ public class RoyalGameOfUrAIs {
         int position = ur.getPieces()[cp][i];
         int next = position + ur.getRoll();
         return position <= 4 && next > 4 ? 1 : 0;
+    });
+    public static final SimpleScorer<RoyalGameOfUr, Integer> riskOfBeingTakenHere = new SimpleScorer<>((i, params) -> {
+        RoyalGameOfUr ur = params.getParameters();
+        int cp = ur.getCurrentPlayer();
+        int position = ur.getPieces()[cp][i];
+        int nextPlayer = (ur.getCurrentPlayer() + 1) % ur.getPieces().length;
+        IntUnaryOperator positionToTakePossible = roll -> ur.canKnockout(position) && ur.playerOccupies(nextPlayer, position - roll) ? 1 : 0;
+        double take1 = positionToTakePossible.applyAsInt(1) * 4.0 / 16.0;
+        double take2 = positionToTakePossible.applyAsInt(2) * 6.0 / 16.0;
+        double take3 = positionToTakePossible.applyAsInt(3) * 4.0 / 16.0;
+        double take4 = positionToTakePossible.applyAsInt(4) * 1.0 / 16.0;
+        return take1 + take2 + take3 + take4;
     });
     public static final SimpleScorer<RoyalGameOfUr, Integer> riskOfBeingTaken = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
