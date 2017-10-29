@@ -14,9 +14,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.exit;
-import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.gotoFlower;
-import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.knockout;
+import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.*;
+import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.leaveSafety;
 
 public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
 
@@ -42,6 +41,29 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
     public Optional<PlayerController<RoyalGameOfUr>> inviteAI(LobbyGame<RoyalGameOfUr> game, String aiName, Object aiConfig, Object playerConfiguration) {
         if (aiName.equals("KnockoutFlowerExit")) {
             RoyalGameOfUrAIs.URScorer ai = new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower).withScorer(exit));
+            return Optional.of(ai);
+        }
+        if (aiName.equals("KFE521S3")) {
+            URScorer ai = new URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
+                    .withScorer(knockout, 5)
+                    .withScorer(gotoFlower, 2)
+                    .withScorer(gotoSafety, 0.1)
+                    .withScorer(leaveSafety, -0.1)
+                    .withScorer(riskOfBeingTaken, -0.1)
+                    .withScorer(exit));
+            return Optional.of(ai);
+        }
+        if (aiName.equals("KFE521S2")) {
+            URScorer ai = new URScorer("KFE521S2", RoyalGameOfUrAIs.scf()
+                    .withScorer(knockout, 5)
+                    .withScorer(gotoFlower, 2)
+                    .withScorer(gotoSafety, 0.1)
+                    .withScorer(leaveSafety, -0.1)
+                    .withScorer(exit));
+            return Optional.of(ai);
+        }
+        if (aiName.equals("KnockoutFlower")) {
+            RoyalGameOfUrAIs.URScorer ai = new RoyalGameOfUrAIs.URScorer("KnockoutFlower", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower));
             return Optional.of(ai);
         }
         return Optional.empty();
