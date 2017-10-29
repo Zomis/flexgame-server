@@ -45,9 +45,13 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
     @Override
     public ActionResult performAction(RunningGame<RoyalGameOfUr> running, PlayerInGame player, String actionType, Object actionData) {
         RoyalGameOfUr game = running.getGame();
+        return performAction(game, player.getIndex(), actionType, actionData);
+    }
+
+    public ActionResult performAction(RoyalGameOfUr game, int index, String actionType, Object actionData) {
         switch (actionType) {
             case "roll":
-                if (game.getCurrentPlayer() != player.getIndex()) {
+                if (game.getCurrentPlayer() != index) {
                     return new ActionResult(false, "Not your turn");
                 }
                 if (!game.isRollTime()) {
@@ -57,13 +61,13 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
                 return new ActionResult(true, "Rolled " + roll);
             case "move":
                 int pos = mapper.convertValue(actionData, Integer.class);
-                if (game.getCurrentPlayer() != player.getIndex()) {
+                if (game.getCurrentPlayer() != index) {
                     return new ActionResult(false, "Not your turn");
                 }
                 if (!game.isMoveTime()) {
                     return new ActionResult(false, "Roll first");
                 }
-                boolean ok = game.move(player.getIndex(), pos, game.getRoll());
+                boolean ok = game.move(index, pos, game.getRoll());
                 return new ActionResult(ok, ok ? "" : "Cannot move that");
             default:
                 return new ActionResult(false, "Unknown action");
