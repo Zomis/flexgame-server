@@ -1,4 +1,4 @@
-package net.zomis.spring.games.impls;
+package net.zomis.spring.games.impls.ur;
 
 import java.util.Arrays;
 import java.util.Random;

@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zomis.spring.games.generic.v2.ActionResult;
 import net.zomis.spring.games.generic.v2.GameHelper2;
 import net.zomis.spring.games.generic.v2.GameRestDelegate2;
-import net.zomis.spring.games.impls.RoyalGameOfUrHelper;
+import net.zomis.spring.games.impls.ur.RoyalGameOfUrHelper;
 import net.zomis.spring.games.impls.TTTGameH;
 import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

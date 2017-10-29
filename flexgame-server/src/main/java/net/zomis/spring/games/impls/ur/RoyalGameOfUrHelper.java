@@ -1,4 +1,4 @@
-package net.zomis.spring.games.impls;
+package net.zomis.spring.games.impls.ur;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -7,12 +7,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
-import net.zomis.spring.games.generic.v2.ActionResult;
-import net.zomis.spring.games.generic.v2.GameHelper2;
-import net.zomis.spring.games.generic.v2.LobbyGame;
-import net.zomis.spring.games.generic.v2.RunningGame;
+import net.zomis.spring.games.generic.v2.*;
+import net.zomis.spring.games.impls.ur.RoyalGameOfUr;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.exit;
+import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.gotoFlower;
+import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.knockout;
 
 public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
 
@@ -32,6 +36,15 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
             return new ActionResult(true, "OK");
         }
         return new ActionResult(false, "Game is full");
+    }
+
+    @Override
+    public Optional<PlayerController<RoyalGameOfUr>> inviteAI(LobbyGame<RoyalGameOfUr> game, String aiName, Object aiConfig, Object playerConfiguration) {
+        if (aiName.equals("KnockoutFlowerExit")) {
+            RoyalGameOfUrAIs.URScorer ai = new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit", Arrays.asList(knockout, gotoFlower, exit));
+            return Optional.of(ai);
+        }
+        return Optional.empty();
     }
 
     @Override
