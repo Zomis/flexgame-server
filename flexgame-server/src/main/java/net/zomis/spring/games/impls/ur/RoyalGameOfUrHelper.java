@@ -76,6 +76,9 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
     }
 
     public ActionResult performAction(RoyalGameOfUr game, int index, String actionType, Object actionData) {
+        if (game.isFinished()) {
+            return new ActionResult(false, "Game Over. Winner is " + game.getWinner());
+        }
         switch (actionType) {
             case "roll":
                 if (game.getCurrentPlayer() != index) {
