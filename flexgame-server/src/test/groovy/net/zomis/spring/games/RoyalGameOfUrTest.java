@@ -31,6 +31,45 @@ public class RoyalGameOfUrTest {
     }
 
     @Test
+    public void aiTest() {
+        RoyalGameOfUr ur = setup(1, 2, new int[][]{{15, 15, 15, 15, 11, 3, 2}, {15, 9, 7, 4, 3, 0, 0}});
+        URScorer ai = new URScorer("KnockoutFlower", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower));
+        FieldScores<RoyalGameOfUr, Integer> scores = ai.getProducer().analyzeAndScore(ur);
+        System.out.println(scores.getScores());
+        Optional<ActionV2> move = ai.control(ur, new PlayerInGame("", 1, "", null, ai));
+        assertEquals(9, move.get().getActionData().asInt());
+
+        ur = setup(1, 3, new int[][]{{15, 4, 0, 0, 0, 0, 0}, {10, 8, 6, 0, 0, 0, 0}});
+        ai = new RoyalGameOfUrAIs.URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
+                .withScorer(knockout, 5)
+                .withScorer(gotoFlower, 2)
+                .withScorer(gotoSafety, 0.1)
+                .withScorer(leaveSafety, -0.1)
+                .withScorer(riskOfBeingTaken, -0.1)
+                .withScorer(riskOfBeingTakenHere, 0.5)
+                .withScorer(exit));
+
+        Arrays.stream(RoyalGameOfUrAIs.class.getFields()).forEach(f -> {
+            try {
+                System.out.println(f.getName() + ": " + f.get(null));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+
+        FieldScoreProducer<RoyalGameOfUr, Integer> producer = ai.getProducer();
+        producer.setDetailed(true);
+        scores = producer.analyzeAndScore(ur);
+        scores.getScores().forEach((key, value) -> {
+            System.out.println(key + "= " + value.getScore() + " : " + value.getScoreMap());
+        });
+        System.out.println(scores.getScores());
+        move = ai.control(ur, new PlayerInGame("", 1, "", null, ai));
+        assertEquals(6, move.get().getActionData().asInt());
+
+    }
+
+    @Test
     public void fight() {
         GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
@@ -40,6 +79,14 @@ public class RoyalGameOfUrTest {
                         .withScorer(gotoSafety, 0.1)
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -0.1)
+                        .withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KFE521S3C2", RoyalGameOfUrAIs.scf()
+                        .withScorer(knockout, 5)
+                        .withScorer(gotoFlower, 2)
+                        .withScorer(gotoSafety, 1)
+                        .withScorer(leaveSafety, -0.1)
+                        .withScorer(riskOfBeingTaken, -0.1)
+                        .withScorer(riskOfBeingTakenHere, 0.5)
                         .withScorer(exit)),
                 new RoyalGameOfUrAIs.URScorer("KFE521S3C", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
