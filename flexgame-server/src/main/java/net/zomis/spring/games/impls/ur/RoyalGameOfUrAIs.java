@@ -46,11 +46,15 @@ public class RoyalGameOfUrAIs {
     public static class URScorer implements AI {
 
         private final String name;
-        FieldScoreProducer<RoyalGameOfUr, Integer> producer;
+        public final FieldScoreProducer<RoyalGameOfUr, Integer> producer;
 
         public URScorer(String name, ScoreConfigFactory<RoyalGameOfUr, Integer> scoreConfig) {
             producer = new FieldScoreProducer<>(scoreConfig.build(), scoreStrategy);
             this.name = name;
+        }
+
+        public FieldScoreProducer<RoyalGameOfUr, Integer> getProducer() {
+            return producer;
         }
 
         @Override

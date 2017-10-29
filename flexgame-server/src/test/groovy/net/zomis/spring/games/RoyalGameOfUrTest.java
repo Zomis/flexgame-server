@@ -1,30 +1,22 @@
 package net.zomis.spring.games;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import net.zomis.aiscores.*;
-import net.zomis.aiscores.extra.ParamAndField;
-import net.zomis.aiscores.extra.ScoreUtils;
-import net.zomis.aiscores.scorers.ScoreInterface;
-import net.zomis.aiscores.scorers.SimpleScorer;
+import net.zomis.aiscores.FieldScoreProducer;
+import net.zomis.aiscores.FieldScores;
 import net.zomis.fight.FightInterface;
 import net.zomis.fight.FightResults;
 import net.zomis.fight.GameFight;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.v2.ActionV2;
-import net.zomis.spring.games.generic.v2.PlayerController;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUr;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrHelper;
 import org.junit.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.exit;
-import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.gotoFlower;
-import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.knockout;
+import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.*;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 public class RoyalGameOfUrTest {
 
@@ -42,11 +34,26 @@ public class RoyalGameOfUrTest {
     public void fight() {
         GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
-                new RoyalGameOfUrAIs.URScorer("Idiot", RoyalGameOfUrAIs.scf()),
-                new RoyalGameOfUrAIs.URScorer("Knockout", RoyalGameOfUrAIs.scf().withScorer(knockout)),
-                new RoyalGameOfUrAIs.URScorer("KnockoutFlower", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower)),
-                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit", RoyalGameOfUrAIs.scf().withScorer(knockout).withScorer(gotoFlower).withScorer(exit)),
-                new RoyalGameOfUrAIs.URScorer("FlowerExit", RoyalGameOfUrAIs.scf().withScorer(gotoFlower).withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerOld", RoyalGameOfUrAIs.scf().withScorer(knockoutBuggy).withScorer(gotoFlower)),
+                new RoyalGameOfUrAIs.URScorer("KFE521 Safety", RoyalGameOfUrAIs.scf()
+                        .withScorer(knockout, 5)
+                        .withScorer(gotoFlower, 2)
+                        .withScorer(gotoSafety, 0.1)
+                        .withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KFE521S2", RoyalGameOfUrAIs.scf()
+                        .withScorer(knockout, 5)
+                        .withScorer(gotoFlower, 2)
+                        .withScorer(gotoSafety, 0.1)
+                        .withScorer(leaveSafety, -0.1)
+                        .withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
+                        .withScorer(knockout, 5)
+                        .withScorer(gotoFlower, 2)
+                        .withScorer(gotoSafety, 0.1)
+                        .withScorer(leaveSafety, -0.1)
+                        .withScorer(riskOfBeingTaken, -0.1)
+                        .withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KnockoutFlowerExit521", RoyalGameOfUrAIs.scf().withScorer(knockout, 5).withScorer(gotoFlower, 2).withScorer(exit)),
         };
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
         FightInterface<RoyalGameOfUrAIs.AI> strat = new FightInterface<RoyalGameOfUrAIs.AI>() {
@@ -63,7 +70,7 @@ public class RoyalGameOfUrTest {
                 return players[ur.getWinner()];
             }
         };
-        FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 50, strat);
+        FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 1000, strat);
         System.out.println(results.toStringMultiLine());
     }
 
