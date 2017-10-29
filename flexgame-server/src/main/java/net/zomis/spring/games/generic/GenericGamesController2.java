@@ -105,9 +105,7 @@ public class GenericGamesController2 implements InitializingBean {
     public ResponseEntity<ActionResult> action(@PathVariable("gameType") String gameType, @PathVariable("game") String game,
              @PathVariable("type") String type,
              @RequestParam("token") String authToken, @RequestBody JsonNode action) {
-        ResponseEntity<ActionResult> result = delegate(gameType).action(game, authToken, type, action);
-        logger.info("Action result: " + result);
-        return result;
+        return delegate(gameType).action(game, authToken, type, action);
     }
 
     @Override
