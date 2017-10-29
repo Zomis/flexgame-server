@@ -77,7 +77,6 @@ public class GameRestDelegate2<G> {
     }
 
     public ResponseEntity<Object> getDetailedInfo(String uuid) {
-        logger.info("Received details request: " + uuid);
         RunningGame<G> game = runningGames.get(uuid);
         if (game == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -87,7 +86,6 @@ public class GameRestDelegate2<G> {
 
     public ResponseEntity<ActionResult> action(String gameUUID, String authToken,
             String actionType, JsonNode jsonNode) {
-        logger.info("Received action request of type '" + actionType + "' in game " + gameUUID + ": " + jsonNode);
         RunningGame<G> game = runningGames.get(gameUUID);
         if (game == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -98,6 +96,8 @@ public class GameRestDelegate2<G> {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ActionResult(false, "Player in game not found"));
         }
         ActionResult result = helper.performAction(game, player.get(), actionType, jsonNode);
+        logger.info(String.format("Received action request of type '%s' in game %s by player %d: %s. Result %s",
+                actionType, gameUUID, player.get().getIndex(), jsonNode, result));
         if (result == null) {
             throw new NullPointerException("Perform action must return a response");
         }
@@ -152,6 +152,8 @@ public class GameRestDelegate2<G> {
             logger.warn("Controller " + controller + " tried to perform illegal action: " + act + " resulting in " + actionResult);
             return ResponseEntity.status(HttpStatus.OK).body(actionResult);
         }
+        logger.info(String.format("Controller %s did action request of type '%s' in game %s by player %d: %s. Result %s",
+                controller, act.getName(), gameId, aiPlayer.get().getIndex(), act.getActionData(), result));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(actionResult);
     }
