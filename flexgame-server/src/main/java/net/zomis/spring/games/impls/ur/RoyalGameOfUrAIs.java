@@ -55,6 +55,9 @@ public class RoyalGameOfUrAIs {
 
         @Override
         public Optional<ActionV2> control(RoyalGameOfUr game, PlayerInGame player) {
+            if (game.getCurrentPlayer() != player.getIndex()) {
+                return Optional.empty();
+            }
             if (game.isRollTime()) {
                 return Optional.of(new ActionV2("roll", null));
             }
