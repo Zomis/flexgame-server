@@ -162,6 +162,10 @@ Fxxx  Fx
         return pieces;
     }
 
+    public int[][] getPiecesCopy() {
+        return Arrays.stream(this.pieces).map(arr -> Arrays.copyOf(arr, arr.length)).toArray(int[][]::new);
+    }
+
     public boolean isFinished() {
         return getWinner() != NO_WINNER;
     }
@@ -173,6 +177,10 @@ Fxxx  Fx
             }
         }
         return NO_WINNER;
+    }
+
+    public boolean canKnockout(int position) {
+        return position > 4 && position < EXIT - 2 && !isFlower(position);
     }
 
 }
