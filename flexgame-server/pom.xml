@@ -108,6 +108,16 @@
             <artifactId>groovy-all</artifactId>
             <version>2.4.7</version>
         </dependency>
+        <dependency>
+            <groupId>net.zomis</groupId>
+            <artifactId>fights</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>net.zomis</groupId>
+            <artifactId>scorers</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

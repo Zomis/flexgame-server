@@ -23,11 +23,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="flexgame-server" />
         <module name="monopoly-model" />
         <module name="monopoly-spring" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="flexgame-server" target="1.8" />
       <module name="monopoly" target="1.5" />
       <module name="monopoly-model" target="1.8" />
       <module name="monopoly-spring" target="1.8" />

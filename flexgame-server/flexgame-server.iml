@@ -61,5 +61,7 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
     <orderEntry type="module" module-name="monopoly-model" />
     <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:2.4.7" level="project" />
+    <orderEntry type="library" name="Maven: net.zomis:fights:0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: net.zomis:scorers:0.2-SNAPSHOT" level="project" />
   </component>
 </module>
