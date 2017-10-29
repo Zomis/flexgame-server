@@ -84,6 +84,9 @@ Fxxx  Fx
     }
 
     private boolean canMoveTo(int currentPlayer, int nextPosition) {
+        if (isFinished()) {
+            return false;
+        }
         if (nextPosition == EXIT) {
             return true;
         }
@@ -122,6 +125,9 @@ Fxxx  Fx
     }
 
     public boolean move(int playerIndex, int position, int steps) {
+        if (isFinished()) {
+            return false;
+        }
         if (!canMove(playerIndex, position, steps)) {
             return false;
         }
