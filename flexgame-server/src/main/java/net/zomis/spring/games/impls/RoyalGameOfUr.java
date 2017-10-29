@@ -1,11 +1,13 @@
 package net.zomis.spring.games.impls;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class RoyalGameOfUr {
     private static final int NOT_ROLLED = -1;
+    private static final int NO_WINNER = -1;
     private final Random random = new Random();
-    private static final int EXIT = 15;
+    public static final int EXIT = 15;
 
 /*
 // 0 = Outside
@@ -106,7 +108,7 @@ Fxxx  Fx
         }
     }
 
-    private boolean playerOccupies(int currentPlayer, int position) {
+    public boolean playerOccupies(int currentPlayer, int position) {
         for (int piece = 0; piece < this.pieces[currentPlayer].length; piece++) {
             if (this.pieces[currentPlayer][piece] == position) {
                 return true;
@@ -115,7 +117,7 @@ Fxxx  Fx
         return false;
     }
 
-    private boolean canMove(int playerIndex, int position, int steps) {
+    public boolean canMove(int playerIndex, int position, int steps) {
         return canMoveTo(playerIndex, position + steps);
     }
 
@@ -152,12 +154,25 @@ Fxxx  Fx
         }
     }
 
-    private boolean isFlower(int position) {
+    public boolean isFlower(int position) {
         return (position == 4) || (position == 8) || (position == EXIT - 1);
     }
 
     public int[][] getPieces() {
         return pieces;
+    }
+
+    public boolean isFinished() {
+        return getWinner() != NO_WINNER;
+    }
+
+    public int getWinner() {
+        for (int i = 0; i < this.pieces.length; i++) {
+            if (Arrays.stream(this.pieces[i]).allMatch(v -> v == EXIT)) {
+                return i;
+            }
+        }
+        return NO_WINNER;
     }
 
 }
