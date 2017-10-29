@@ -153,7 +153,7 @@ public class GameRestDelegate2<G> {
             return ResponseEntity.status(HttpStatus.OK).body(actionResult);
         }
         logger.info(String.format("Controller %s did action request of type '%s' in game %s by player %d: %s. Result %s",
-                controller, act.getName(), gameId, aiPlayer.get().getIndex(), act.getActionData(), result));
+                controller, act.getName(), gameId, aiPlayer.get().getIndex(), act.getActionData(), actionResult));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(actionResult);
     }
