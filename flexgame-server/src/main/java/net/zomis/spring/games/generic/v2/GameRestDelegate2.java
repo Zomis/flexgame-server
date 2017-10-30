@@ -27,8 +27,10 @@ public class GameRestDelegate2<G> {
     private final TokenGenerator tokenGenerator;
     private final Map<String, LobbyGame<G>> lobbyGames = new ConcurrentHashMap<>();
     private final Map<String, RunningGame<G>> runningGames = new ConcurrentHashMap<>();
+    private final DatabaseInterface<G> db;
 
-    public GameRestDelegate2(GameHelper2<G> helper, TokenGenerator tokenGenerator) {
+    public GameRestDelegate2(DatabaseInterface<G> db, GameHelper2<G> helper, TokenGenerator tokenGenerator) {
+        this.db = db;
         this.helper = helper;
         this.tokenGenerator = tokenGenerator;
     }
@@ -95,13 +97,14 @@ public class GameRestDelegate2<G> {
             logger.warn("No player found with " + authToken + " in game " + game);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ActionResult(false, "Player in game not found"));
         }
-        ActionResult result = helper.performAction(game, player.get(), actionType, jsonNode);
+        InternalActionResult result = helper.performAction(game, player.get(), actionType, jsonNode);
+        db.action(game, new ActionV2(actionType, jsonNode), result);
         logger.info(String.format("Received action request of type '%s' in game %s by player %d: %s. Result %s",
                 actionType, gameUUID, player.get().getIndex(), jsonNode, result));
         if (result == null) {
             throw new NullPointerException("Perform action must return a response");
         }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(result.toActionResult());
     }
 
     public ResponseEntity<StartGameResponse> start(String game) {
@@ -110,8 +113,9 @@ public class GameRestDelegate2<G> {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StartGameResponse(false));
         }
         synchronized (this) {
-            lobbyGames.remove(game);
+            LobbyGame<G> lobbyGame = lobbyGames.remove(game);
             RunningGame<G> running = theGame.get().startGame();
+            db.startGame(lobbyGame, running);
             runningGames.put(game, running);
         }
         return ResponseEntity.ok(new StartGameResponse(true));
@@ -147,15 +151,16 @@ public class GameRestDelegate2<G> {
             return ResponseEntity.ok(null);
         }
         ActionV2 act = result.get();
-        ActionResult actionResult = helper.performAction(game, aiPlayer.get(), act.getName(), act.getActionData());
+        InternalActionResult actionResult = helper.performAction(game, aiPlayer.get(), act.getName(), act.getActionData());
+        db.action(game, act, actionResult);
         if (!actionResult.isOk()) {
             logger.warn("Controller " + controller + " tried to perform illegal action: " + act + " resulting in " + actionResult);
-            return ResponseEntity.status(HttpStatus.OK).body(actionResult);
+            return ResponseEntity.status(HttpStatus.OK).body(actionResult.toActionResult());
         }
         logger.info(String.format("Controller %s did action request of type '%s' in game %s by player %d: %s. Result %s",
                 controller, act.getName(), gameId, aiPlayer.get().getIndex(), act.getActionData(), actionResult));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(actionResult);
+        return ResponseEntity.status(HttpStatus.CREATED).body(actionResult.toActionResult());
     }
 
 }

@@ -30,7 +30,7 @@ public interface GameHelper2<G> {
      */
     // TODO: Use Either<G, String> or something to return failure status
     G startGame(LobbyGame<G> lobbyGame);
-    ActionResult performAction(RunningGame<G> game, PlayerInGame player, String actionType, Object actionData);
+    InternalActionResult performAction(RunningGame<G> game, PlayerInGame player, String actionType, Object actionData);
     Object gameSummary(RunningGame<G> game);
     Object gameDetails(RunningGame<G> game, PlayerInGame fromWhosPerspective);
     // TODO: Web sockets should only recieve updates, not full-game status every time. Use some listener?

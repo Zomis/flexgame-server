@@ -2,7 +2,9 @@ package net.zomis.spring.games.generic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoClient;
 import net.zomis.spring.games.generic.v2.ActionResult;
+import net.zomis.spring.games.generic.v2.DatabaseInterface;
 import net.zomis.spring.games.generic.v2.GameHelper2;
 import net.zomis.spring.games.generic.v2.GameRestDelegate2;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrHelper;
@@ -11,6 +13,7 @@ import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +31,11 @@ public class GenericGamesController2 implements InitializingBean {
     private Map<String, GameRestDelegate2<?>> games = new ConcurrentHashMap<>();
     private final TokenGenerator generator = new TokenGenerator();
 
-    public void addGame(String name, GameHelper2<?> helper) {
-        this.games.put(name, new GameRestDelegate2<>(helper, generator));
+    @Autowired
+    private MongoClient client;
+
+    public <G> void addGame(String name, DatabaseInterface<G> db, GameHelper2<G> helper) {
+        this.games.put(name, new GameRestDelegate2<>(db, helper, generator));
     }
 
     private GameRestDelegate2<?> delegate(String gameType) {
@@ -109,8 +115,8 @@ public class GenericGamesController2 implements InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        addGame("ttt", new TTTGameH());
-        addGame("ur", new RoyalGameOfUrHelper());
+    public void afterPropertiesSet() {
+        addGame("ttt", new DBMongo<>(client), new TTTGameH());
+        addGame("ur", new DBMongo<>(client), new RoyalGameOfUrHelper());
     }
 }

@@ -54,22 +54,22 @@ public class TTTGameH implements GameHelper2<TTTGame> {
     }
 
     @Override
-    public ActionResult performAction(RunningGame<TTTGame> running, PlayerInGame player, String actionType, Object actionData) {
+    public InternalActionResult performAction(RunningGame<TTTGame> running, PlayerInGame player, String actionType, Object actionData) {
         switch (actionType) {
             case "move":
                 TTTGame game = running.getGame();
                 Point point = mapper.convertValue(actionData, Point.class);
                 if (game.getTurn().ordinal() != player.getIndex()) {
-                    return new ActionResult(false, "Not your turn");
+                    return new InternalActionResult(false, "Not your turn");
                 }
                 TTPlayer pieceAtPos = game.getBoard()[point.y][point.x];
                 if (pieceAtPos != null) {
-                    return new ActionResult(false, "Position already taken");
+                    return new InternalActionResult(false, "Position already taken");
                 }
                 game.move(game.getPlayerByIndex(player.getIndex()), point.x, point.y);
-                return new ActionResult(true, "");
+                return new InternalActionResult(true, "");
             default:
-                return new ActionResult(false, "Unknown action");
+                return new InternalActionResult(false, "Unknown action");
         }
     }
 

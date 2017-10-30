@@ -70,37 +70,37 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
     }
 
     @Override
-    public ActionResult performAction(RunningGame<RoyalGameOfUr> running, PlayerInGame player, String actionType, Object actionData) {
+    public InternalActionResult performAction(RunningGame<RoyalGameOfUr> running, PlayerInGame player, String actionType, Object actionData) {
         RoyalGameOfUr game = running.getGame();
         return performAction(game, player.getIndex(), actionType, actionData);
     }
 
-    public ActionResult performAction(RoyalGameOfUr game, int index, String actionType, Object actionData) {
+    public InternalActionResult performAction(RoyalGameOfUr game, int index, String actionType, Object actionData) {
         if (game.isFinished()) {
-            return new ActionResult(false, "Game Over. Winner is " + game.getWinner());
+            return new InternalActionResult(false, "Game Over. Winner is " + game.getWinner());
         }
         switch (actionType) {
             case "roll":
                 if (game.getCurrentPlayer() != index) {
-                    return new ActionResult(false, "Not your turn");
+                    return new InternalActionResult(false, "Not your turn");
                 }
                 if (!game.isRollTime()) {
-                    return new ActionResult(false, "You need to move");
+                    return new InternalActionResult(false, "You need to move");
                 }
                 int roll = game.roll();
-                return new ActionResult(true, "Rolled " + roll);
+                return new InternalActionResult(true, "Rolled " + roll, roll);
             case "move":
                 int pos = mapper.convertValue(actionData, Integer.class);
                 if (game.getCurrentPlayer() != index) {
-                    return new ActionResult(false, "Not your turn");
+                    return new InternalActionResult(false, "Not your turn");
                 }
                 if (!game.isMoveTime()) {
-                    return new ActionResult(false, "Roll first");
+                    return new InternalActionResult(false, "Roll first");
                 }
                 boolean ok = game.move(index, pos, game.getRoll());
-                return new ActionResult(ok, ok ? "" : "Cannot move that");
+                return new InternalActionResult(ok, ok ? "" : "Cannot move that");
             default:
-                return new ActionResult(false, "Unknown action");
+                return new InternalActionResult(false, "Unknown action");
         }
     }
 

@@ -1,5 +1,7 @@
 package net.zomis.spring.games;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import net.zomis.spring.games.generic.GroovyGames;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +17,12 @@ public class Application {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
 
+    }
+
+    @Bean
+    public MongoClient mongoClient() {
+        MongoClientURI uri = new MongoClientURI("mongodb://127.0.0.1:27017");
+        return new MongoClient(uri);
     }
 
     @Bean
