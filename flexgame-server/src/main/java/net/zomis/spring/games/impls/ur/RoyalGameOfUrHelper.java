@@ -39,6 +39,9 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
 
     @Override
     public Optional<PlayerController<RoyalGameOfUr>> inviteAI(LobbyGame<RoyalGameOfUr> game, String aiName, Object aiConfig, Object playerConfiguration) {
+        if (game.getPlayers().size() >= 2) {
+            return Optional.empty();
+        }
         if (aiName.equals("KFE521S3")) {
             URScorer ai = new URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
                     .withScorer(knockout, 5)
