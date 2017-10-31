@@ -32,4 +32,12 @@ public class InternalActionResult {
         return resultData;
     }
 
+    @Override
+    public String toString() {
+        return "InternalActionResult{" +
+                "ok=" + ok +
+                ", status='" + status + '\'' +
+                ", resultData=" + resultData +
+                '}';
+    }
 }
