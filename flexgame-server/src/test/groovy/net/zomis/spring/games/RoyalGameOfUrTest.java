@@ -80,6 +80,11 @@ public class RoyalGameOfUrTest {
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -0.1)
                         .withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KFE521T", RoyalGameOfUrAIs.scf()
+                        .withScorer(knockout, 5)
+                        .withScorer(gotoFlower, 2)
+                        .withScorer(riskOfBeingTaken, -0.1)
+                        .withScorer(exit)),
                 new RoyalGameOfUrAIs.URScorer("KFE521S3C2", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)

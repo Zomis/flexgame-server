@@ -52,6 +52,14 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
                     .withScorer(exit));
             return Optional.of(ai);
         }
+        if (aiName.equals("KFE521T")) {
+            URScorer ai = new URScorer("KFE521T", RoyalGameOfUrAIs.scf()
+                    .withScorer(knockout, 5)
+                    .withScorer(gotoFlower, 2)
+                    .withScorer(riskOfBeingTaken, -0.1)
+                    .withScorer(exit));
+            return Optional.of(ai);
+        }
         if (aiName.equals("KFE521S2")) {
             URScorer ai = new URScorer("KFE521S2", RoyalGameOfUrAIs.scf()
                     .withScorer(knockout, 5)
