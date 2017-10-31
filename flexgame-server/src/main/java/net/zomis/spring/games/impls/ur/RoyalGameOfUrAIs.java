@@ -95,7 +95,7 @@ public class RoyalGameOfUrAIs {
     public static final SimpleScorer<RoyalGameOfUr, Integer> position = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
-        return ur.getPieces()[cp][i];
+        return (double) ur.getPieces()[cp][i] / RoyalGameOfUr.EXIT;
     });
     public static final SimpleScorer<RoyalGameOfUr, Integer> leaveFlower = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
