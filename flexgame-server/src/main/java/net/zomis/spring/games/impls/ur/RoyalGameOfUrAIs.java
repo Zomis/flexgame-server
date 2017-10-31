@@ -117,6 +117,11 @@ public class RoyalGameOfUrAIs {
         int next = position + ur.getRoll();
         return position <= 4 && next > 4 ? 1 : 0;
     });
+    public static final SimpleScorer<RoyalGameOfUr, Integer> whichPiece = new SimpleScorer<>((i, params) -> {
+        RoyalGameOfUr ur = params.getParameters();
+        int cp = ur.getCurrentPlayer();
+        return 1.0 * (i + 1) / ur.getPieces()[cp].length;
+    });
     public static final SimpleScorer<RoyalGameOfUr, Integer> riskOfBeingTakenHere = new SimpleScorer<>((i, params) -> {
         RoyalGameOfUr ur = params.getParameters();
         int cp = ur.getCurrentPlayer();
