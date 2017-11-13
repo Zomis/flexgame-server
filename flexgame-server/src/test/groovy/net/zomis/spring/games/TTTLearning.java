@@ -61,6 +61,7 @@ public class TTTLearning {
         // learn.setLearningRate(-0.01); // This leads to bad player moves. Like XOX-OXO-_X_ instead of XOX-OXO-X__
         learn.setDiscountFactor(-0.9);
         learn.setLearningRate(1.0);
+        learn.setRandomMoveProbability(1.0);
 
         Scanner scanner = new Scanner(System.in);
         int i = 0;
@@ -75,6 +76,9 @@ public class TTTLearning {
             if (debug) {
                 System.out.println("START NEW " + i);
             }
+            if (i % 100 == 0 && learn.getRandomMoveProbability() >= 0.05) {
+                learn.setRandomMoveProbability(learn.getRandomMoveProbability() - 0.01);
+            }
             int stepCount = 0;
             TTBase board = new TTFactories().classicMNK(3);
             TTController game = new TTClassicController(board);
@@ -84,8 +88,8 @@ public class TTTLearning {
                     this.print(game);
                 }
                 if (debug && game.getCurrentPlayer().is(TTPlayer.X)) {
-                    //int pos = humanMove(learn, game, scanner);
-                    int pos = aiMove(game);
+                    int pos = humanMove(game, scanner);
+                    //int pos = aiMove(game);
                     if (!actionPossible.test(game, pos)) {
                         System.out.println("Illegal move.");
                         continue;

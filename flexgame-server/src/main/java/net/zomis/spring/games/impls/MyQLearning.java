@@ -2,6 +2,7 @@ package net.zomis.spring.games.impls;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -11,6 +12,8 @@ public class MyQLearning<T> {
     private double discountFactor = 0.99;
     private double learningRate = 0.01;
     private boolean debug;
+    private double randomMoveProbability = 0.0;
+    private final Random random = new Random();
 
     public void setDebug(boolean debug) {
         this.debug = debug;
@@ -56,7 +59,18 @@ public class MyQLearning<T> {
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction) {
-        return this.step(environment, performAction, pickBestAction(environment));
+        if (random.nextDouble() < randomMoveProbability) {
+            return this.step(environment, performAction, pickRandomAction(environment));
+        } else {
+            return this.step(environment, performAction, pickBestAction(environment));
+        }
+    }
+
+    private int pickRandomAction(T environment) {
+        int count = (int) IntStream.range(0, maxActions).filter(i -> actionPossible.test(environment, i)).count();
+        int actionIndex = random.nextInt(count);
+        return IntStream.range(0, maxActions).filter(i -> actionPossible.test(environment, i))
+            .limit(actionIndex + 1).reduce(0, (old, next) -> next);
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction, int action) {
@@ -127,6 +141,14 @@ public class MyQLearning<T> {
 
     public void setDiscountFactor(double discountFactor) {
         this.discountFactor = discountFactor;
+    }
+
+    public void setRandomMoveProbability(double randomMoveProbability) {
+        this.randomMoveProbability = randomMoveProbability;
+    }
+
+    public double getRandomMoveProbability() {
+        return randomMoveProbability;
     }
 
 }
