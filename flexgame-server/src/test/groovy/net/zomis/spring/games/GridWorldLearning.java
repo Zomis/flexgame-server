@@ -18,7 +18,7 @@ public class GridWorldLearning {
         Function<GridWorld, String> stateToString = g -> String.valueOf(g.getPosX()) + g.getPosY();
         MyQLearning.ActionPossible<GridWorld> actionPossible = GridWorld::canMove;
         MyQLearning.PerformAction<GridWorld> performAction = GridWorld::performMove;
-        MyQLearning<GridWorld> learn = new MyQLearning<GridWorld>(4, stateToString, actionPossible, performAction);
+        MyQLearning<GridWorld> learn = new MyQLearning<GridWorld>(4, stateToString, actionPossible);
 
         Scanner scanner = new Scanner(System.in);
         for (int i = 0; i < 1000; i++) {
@@ -27,7 +27,7 @@ public class GridWorldLearning {
             GridWorld game = new GridWorld();
             while (!game.isFinished()) {
        //         game.print();
-                MyQLearning.Rewarded<GridWorld> step = learn.step(game);
+                MyQLearning.Rewarded<GridWorld> step = learn.step(game, performAction);
                 game = step.getState();
                 stepCount++;
            //     System.out.printf("Step %d. Performed action with reward %f%n", stepCount, step.getReward());

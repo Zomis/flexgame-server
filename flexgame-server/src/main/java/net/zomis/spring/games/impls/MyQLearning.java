@@ -8,8 +8,13 @@ import java.util.stream.IntStream;
 public class MyQLearning<T> {
 
     private static final double DEFAULT_QVALUE = 0;
-    private final double discountFactor = 0.99;
-    private final double learningRate = 0.01;
+    private double discountFactor = 0.99;
+    private double learningRate = 0.01;
+    private boolean debug;
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
 
     public interface ActionPossible<T> {
         boolean test(T environment, int action);
@@ -39,23 +44,22 @@ public class MyQLearning<T> {
 
     private final Map<String, Double> qTable = new HashMap<>();
     private final Function<T, String> stateToString;
-    private final PerformAction<T> performAction;
     private final ActionPossible<T> actionPossible;
     private final int maxActions;
 
     public MyQLearning(int maxActions,
                Function<T, String> stateToString,
-               ActionPossible<T> actionPossible,
-               PerformAction<T> performAction) {
+               ActionPossible<T> actionPossible) {
         this.maxActions = maxActions;
         this.stateToString = stateToString;
         this.actionPossible = actionPossible;
-        this.performAction = performAction;
     }
 
-    public Rewarded<T> step(T environment) {
-        int action = pickBestAction(environment);
+    public Rewarded<T> step(T environment, PerformAction<T> performAction) {
+        return this.step(environment, performAction, pickBestAction(environment));
+    }
 
+    public Rewarded<T> step(T environment, PerformAction<T> performAction, int action) {
         String state = stateToString.apply(environment);
         String stateAction = state + action;
 
@@ -73,8 +77,10 @@ public class MyQLearning<T> {
         double oldValue = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
         double learnedValue = rewardT + discountFactor * estimateOfOptimalFutureValue;
         double newValue = (1 - learningRate) * oldValue + learningRate * learnedValue;
-/*        System.out.printf("Performed %d in state %s with reward %f. Old Value %f. Learned %f. New %f%n", action, state, rewardT,
-                oldValue, learnedValue, newValue);*/
+        if (debug) {
+            System.out.printf("Performed %d in state %s with reward %f. Old Value %f. Learned %f. New %f%n", action, state, rewardT,
+                oldValue, learnedValue, newValue);
+        }
         this.qTable.put(stateAction, newValue);
         return rewardedState;
     }
@@ -105,6 +111,22 @@ public class MyQLearning<T> {
 
     public Map<String, Double> getQTable() {
         return new HashMap<>(qTable);
+    }
+
+    public double getLearningRate() {
+        return learningRate;
+    }
+
+    public void setLearningRate(double learningRate) {
+        this.learningRate = learningRate;
+    }
+
+    public double getDiscountFactor() {
+        return discountFactor;
+    }
+
+    public void setDiscountFactor(double discountFactor) {
+        this.discountFactor = discountFactor;
     }
 
 }
