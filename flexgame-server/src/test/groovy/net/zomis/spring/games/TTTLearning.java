@@ -48,10 +48,11 @@ public class TTTLearning {
             TTPlayer player = tt.getCurrentPlayer();
             tt.play(tt.getGame().getSub(x, y));
             double reward = 0;
-            if (isDraw(tt)) {
-                reward = 0;
-            } else if (tt.isGameOver() && tt.getWonBy().isExactlyOnePlayer()) {
+
+            if (tt.isGameOver() && tt.getWonBy().isExactlyOnePlayer()) {
                 reward = tt.getWonBy().is(player) ? 1 : -1;
+            } else if (isDraw(tt)) {
+                reward = 0;
             } else {
                 reward = -0.01;
             }
