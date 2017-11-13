@@ -109,6 +109,16 @@
             <version>2.4.7</version>
         </dependency>
         <dependency>
+            <groupId>net.zomis</groupId>
+            <artifactId>uttt</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>se.stromvap.royal.game.of.ur</groupId>
+            <artifactId>grpc</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>3.5.0</version>
