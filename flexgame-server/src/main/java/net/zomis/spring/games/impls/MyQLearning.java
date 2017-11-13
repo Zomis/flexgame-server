@@ -3,10 +3,11 @@ package net.zomis.spring.games.impls;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-public class MyQLearning<T> {
+public class MyQLearning<T, S> {
 
     private static final double DEFAULT_QVALUE = 0;
     private double discountFactor = 0.99;
@@ -45,17 +46,20 @@ public class MyQLearning<T> {
         Rewarded<T> apply(T environment, int action);
     }
 
-    private final Map<String, Double> qTable = new HashMap<>();
-    private final Function<T, String> stateToString;
+    private final Map<S, Double> qTable = new HashMap<>();
+    private final Function<T, S> stateFunction;
+    private final BiFunction<S, Integer, S> stateActionFunction;
     private final ActionPossible<T> actionPossible;
     private final int maxActions;
 
     public MyQLearning(int maxActions,
-               Function<T, String> stateToString,
-               ActionPossible<T> actionPossible) {
+               Function<T, S> stateFunction,
+               ActionPossible<T> actionPossible,
+               BiFunction<S, Integer, S> stateActionFunction) {
         this.maxActions = maxActions;
-        this.stateToString = stateToString;
+        this.stateFunction = stateFunction;
         this.actionPossible = actionPossible;
+        this.stateActionFunction = stateActionFunction;
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction) {
@@ -74,17 +78,17 @@ public class MyQLearning<T> {
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction, int action) {
-        String state = stateToString.apply(environment);
-        String stateAction = state + action;
+        S state = stateFunction.apply(environment);
+        S stateAction = stateActionFunction.apply(state, action);
 
         Rewarded<T> rewardedState = performAction.apply(environment, action);
         T nextState = rewardedState.getState();
         double rewardT = rewardedState.getReward();
 
-        String nextStateStr = stateToString.apply(nextState);
+        S nextStateStr = stateFunction.apply(nextState);
         double estimateOfOptimalFutureValue = IntStream.range(0, maxActions)
                 .filter(i -> actionPossible.test(nextState, i))
-                .mapToObj(i -> nextStateStr + i)
+                .mapToObj(i -> stateActionFunction.apply(nextStateStr, i))
                 .mapToDouble(str -> qTable.getOrDefault(str, DEFAULT_QVALUE)).max()
                 .orElse(0);
 
@@ -100,12 +104,12 @@ public class MyQLearning<T> {
     }
 
     private int pickBestAction(T environment) {
-        String state = stateToString.apply(environment);
+        S state = stateFunction.apply(environment);
         int bestAction = -1;
         double bestValue = -1000;
         for (int i = 0; i < maxActions; i++) {
             if (actionPossible.test(environment, i)) {
-                String stateAction = state + i;
+                S stateAction = stateActionFunction.apply(state, i);
                 double value = DEFAULT_QVALUE;
                 if (qTable.containsKey(stateAction)) {
                     value = qTable.get(stateAction);
@@ -123,7 +127,7 @@ public class MyQLearning<T> {
         return bestAction;
     }
 
-    public Map<String, Double> getQTable() {
+    public Map<S, Double> getQTable() {
         return new HashMap<>(qTable);
     }
 

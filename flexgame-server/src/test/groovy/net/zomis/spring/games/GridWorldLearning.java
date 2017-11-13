@@ -18,7 +18,7 @@ public class GridWorldLearning {
         Function<GridWorld, String> stateToString = g -> String.valueOf(g.getPosX()) + g.getPosY();
         MyQLearning.ActionPossible<GridWorld> actionPossible = GridWorld::canMove;
         MyQLearning.PerformAction<GridWorld> performAction = GridWorld::performMove;
-        MyQLearning<GridWorld> learn = new MyQLearning<GridWorld>(4, stateToString, actionPossible);
+        MyQLearning<GridWorld, String> learn = new MyQLearning<>(4, stateToString, actionPossible, (state, action) -> state + action);
 
         Scanner scanner = new Scanner(System.in);
         for (int i = 0; i < 1000; i++) {

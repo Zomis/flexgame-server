@@ -58,7 +58,7 @@ public class TTTLearning {
             }
             return new MyQLearning.Rewarded<>(tt, reward);
         };
-        MyQLearning<TTController> learn = new MyQLearning<>(9, stateToString, actionPossible);
+        MyQLearning<TTController, String> learn = new MyQLearning<>(9, stateToString, actionPossible, (state, action) -> state + action);
         // learn.setLearningRate(-0.01); // This leads to bad player moves. Like XOX-OXO-_X_ instead of XOX-OXO-X__
         learn.setDiscountFactor(-0.9);
         learn.setLearningRate(1.0);
