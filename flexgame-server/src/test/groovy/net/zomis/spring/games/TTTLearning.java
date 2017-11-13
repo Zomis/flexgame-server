@@ -67,12 +67,14 @@ public class TTTLearning {
         Scanner scanner = new Scanner(System.in);
         int i = 0;
         int BREAK = 100_000;
+        TTPlayer human;
         while (true) {
             i++;
             if (i % Math.ceil(BREAK / 20d) == 0) {
                 System.out.println(i);
             }
             boolean debug = i % BREAK == BREAK - 1;
+            human = debug ? Math.random() < 0.5 ? TTPlayer.X : TTPlayer.O : TTPlayer.NONE;
             learn.setDebug(debug);
             if (debug) {
                 System.out.println("START NEW " + i);
@@ -88,7 +90,7 @@ public class TTTLearning {
                 if (debug) {
                     this.print(game);
                 }
-                if (debug && game.getCurrentPlayer().is(TTPlayer.X)) {
+                if (human.is(game.getCurrentPlayer())) {
                     int pos = humanMove(game, scanner);
                     //int pos = aiMove(game);
                     if (!actionPossible.test(game, pos)) {
