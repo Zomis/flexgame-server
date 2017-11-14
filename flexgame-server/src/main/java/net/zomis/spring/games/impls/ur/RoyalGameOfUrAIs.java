@@ -25,7 +25,7 @@ public class RoyalGameOfUrAIs {
     public interface AI extends PlayerController<RoyalGameOfUr> {}
 
     private static final Collection<Integer> fields = IntStream.range(0, 7).mapToObj(i -> i).collect(Collectors.toList());
-    private static final ScoreStrategy<RoyalGameOfUr, Integer> scoreStrategy = new ScoreStrategy<RoyalGameOfUr, Integer>() {
+    public static final ScoreStrategy<RoyalGameOfUr, Integer> scoreStrategy = new ScoreStrategy<RoyalGameOfUr, Integer>() {
 
         @Override
         public Collection<Integer> getFieldsToScore(RoyalGameOfUr ai) {

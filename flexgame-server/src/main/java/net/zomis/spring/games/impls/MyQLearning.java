@@ -194,4 +194,8 @@ public class MyQLearning<T, S> {
         return randomMoveProbability;
     }
 
+    public int getQTableSize() {
+        return this.qTable.size();
+    }
+
 }
