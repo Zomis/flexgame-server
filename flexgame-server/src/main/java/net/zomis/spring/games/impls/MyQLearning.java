@@ -120,8 +120,9 @@ public class MyQLearning<T, S> {
 
     private int pickBestAction(T environment) {
         S state = stateFunction.apply(environment);
-        int bestAction = -1;
+        int numBestActions = 0;
         double bestValue = -1000;
+        double EPSILON = 0.0001;
         for (int i = 0; i < maxActions; i++) {
             if (actionPossible.test(environment, i)) {
                 S stateAction = stateActionFunction.apply(state, i);
@@ -129,17 +130,40 @@ public class MyQLearning<T, S> {
                 if (qTable.containsKey(stateAction)) {
                     value = qTable.get(stateAction);
                 }
+                double diff = Math.abs(value - bestValue);
+                boolean better = value > bestValue && diff >= EPSILON;
 
-                if (bestAction == -1 || value > bestValue) {
-                    bestAction = i;
+                if (better || numBestActions == 0) {
+                    numBestActions = 1;
                     bestValue = value;
+                } else if (diff < EPSILON) {
+                    numBestActions++;
                 }
             }
         }
-        if (bestAction == -1) {
+        if (numBestActions < 1) {
             throw new IllegalStateException("No successful action in " + environment + ": " + state);
         }
-        return bestAction;
+
+        int pickedAction = random.nextInt(numBestActions);
+        for (int i = 0; i < maxActions; i++) {
+            if (actionPossible.test(environment, i)) {
+                S stateAction = stateActionFunction.apply(state, i);
+                double value = DEFAULT_QVALUE;
+                if (qTable.containsKey(stateAction)) {
+                    value = qTable.get(stateAction);
+                }
+                double diff = Math.abs(value - bestValue);
+
+                if (diff < EPSILON) {
+                    pickedAction--;
+                    if (pickedAction < 0) {
+                        return i;
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("No successful action because of some logic problem.");
     }
 
     public Map<S, Double> getQTable() {
