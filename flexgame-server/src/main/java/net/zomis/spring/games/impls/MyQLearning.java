@@ -69,16 +69,21 @@ public class MyQLearning<T, S> {
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction) {
+        int action = pickAction(environment);
+        return this.step(environment, performAction, action);
+    }
+
+    public int pickAction(T environment) {
         if (random.nextDouble() < randomMoveProbability) {
-            return this.step(environment, performAction, pickRandomAction(environment));
+            return pickRandomAction(environment);
         } else {
-            return this.step(environment, performAction, pickBestAction(environment));
+            return pickBestAction(environment);
         }
     }
 
     private int pickRandomAction(T environment) {
         int count = (int) IntStream.range(0, maxActions).filter(i -> actionPossible.test(environment, i)).count();
-        int actionIndex = random.nextInt(count);
+        long actionIndex = random.nextInt(count);
         return IntStream.range(0, maxActions).filter(i -> actionPossible.test(environment, i))
             .limit(actionIndex + 1).reduce(0, (old, next) -> next);
     }
