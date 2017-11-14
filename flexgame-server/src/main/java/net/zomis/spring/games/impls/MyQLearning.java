@@ -27,10 +27,16 @@ public class MyQLearning<T, S> {
     public static class Rewarded<T> {
         private final T state;
         private final double reward;
+        private Double discountFactor;
 
         public Rewarded(T state, double reward) {
             this.state = state;
             this.reward = reward;
+        }
+
+        public Rewarded<T> withDiscountFactor(double discountFactor) {
+            this.discountFactor = discountFactor;
+            return this;
         }
 
         public double getReward() {
@@ -82,6 +88,10 @@ public class MyQLearning<T, S> {
         S stateAction = stateActionFunction.apply(state, action);
 
         Rewarded<T> rewardedState = performAction.apply(environment, action);
+        if (rewardedState.discountFactor != null) {
+            this.discountFactor = rewardedState.discountFactor;
+        }
+
         T nextState = rewardedState.getState();
         double rewardT = rewardedState.getReward();
 
