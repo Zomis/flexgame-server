@@ -126,10 +126,7 @@ public class MyQLearning<T, S> {
         for (int i = 0; i < maxActions; i++) {
             if (actionPossible.test(environment, i)) {
                 S stateAction = stateActionFunction.apply(state, i);
-                double value = DEFAULT_QVALUE;
-                if (qTable.containsKey(stateAction)) {
-                    value = qTable.get(stateAction);
-                }
+                double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
                 double diff = Math.abs(value - bestValue);
                 boolean better = value > bestValue && diff >= EPSILON;
 
@@ -149,10 +146,7 @@ public class MyQLearning<T, S> {
         for (int i = 0; i < maxActions; i++) {
             if (actionPossible.test(environment, i)) {
                 S stateAction = stateActionFunction.apply(state, i);
-                double value = DEFAULT_QVALUE;
-                if (qTable.containsKey(stateAction)) {
-                    value = qTable.get(stateAction);
-                }
+                double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
                 double diff = Math.abs(value - bestValue);
 
                 if (diff < EPSILON) {
