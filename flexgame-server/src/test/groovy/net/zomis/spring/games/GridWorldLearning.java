@@ -2,6 +2,7 @@ package net.zomis.spring.games;
 
 import net.zomis.spring.games.impls.GridWorld;
 import net.zomis.spring.games.impls.MyQLearning;
+import net.zomis.spring.games.impls.qlearn.QStoreMap;
 import org.junit.Test;
 
 import java.util.Scanner;
@@ -18,7 +19,7 @@ public class GridWorldLearning {
         Function<GridWorld, String> stateToString = g -> String.valueOf(g.getPosX()) + g.getPosY();
         MyQLearning.ActionPossible<GridWorld> actionPossible = GridWorld::canMove;
         MyQLearning.PerformAction<GridWorld> performAction = GridWorld::performMove;
-        MyQLearning<GridWorld, String> learn = new MyQLearning<>(4, stateToString, actionPossible, (state, action) -> state + action);
+        MyQLearning<GridWorld, String> learn = new MyQLearning<>(4, stateToString, actionPossible, (state, action) -> state + action, new QStoreMap<>());
 
         Scanner scanner = new Scanner(System.in);
         for (int i = 0; i < 1000; i++) {

@@ -1,7 +1,7 @@
 package net.zomis.spring.games.impls;
 
-import java.util.HashMap;
-import java.util.Map;
+import net.zomis.spring.games.impls.qlearn.QStore;
+
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 public class MyQLearning<T, S> {
 
     private static final double DEFAULT_QVALUE = 0;
+    private static final double EPSILON = 0.0001;
     private double discountFactor = 0.99;
     private double learningRate = 0.01;
     private boolean debug;
@@ -52,7 +53,7 @@ public class MyQLearning<T, S> {
         Rewarded<T> apply(T environment, int action);
     }
 
-    private final Map<S, Double> qTable = new HashMap<>();
+    private final QStore<S> qTable;
     private final Function<T, S> stateFunction;
     private final BiFunction<S, Integer, S> stateActionFunction;
     private final ActionPossible<T> actionPossible;
@@ -61,11 +62,13 @@ public class MyQLearning<T, S> {
     public MyQLearning(int maxActions,
                Function<T, S> stateFunction,
                ActionPossible<T> actionPossible,
-               BiFunction<S, Integer, S> stateActionFunction) {
+               BiFunction<S, Integer, S> stateActionFunction,
+               QStore<S> qStore) {
         this.maxActions = maxActions;
         this.stateFunction = stateFunction;
         this.actionPossible = actionPossible;
         this.stateActionFunction = stateActionFunction;
+        this.qTable = qStore;
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction) {
@@ -82,10 +85,9 @@ public class MyQLearning<T, S> {
     }
 
     private int pickRandomAction(T environment) {
-        int count = (int) IntStream.range(0, maxActions).filter(i -> actionPossible.test(environment, i)).count();
-        long actionIndex = random.nextInt(count);
-        return IntStream.range(0, maxActions).filter(i -> actionPossible.test(environment, i))
-            .limit(actionIndex + 1).reduce(0, (old, next) -> next);
+        int[] possibleActions = getPossibleActions(environment);
+        int actionIndex = random.nextInt(possibleActions.length);
+        return possibleActions[actionIndex];
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction, int action) {
@@ -122,46 +124,48 @@ public class MyQLearning<T, S> {
         S state = stateFunction.apply(environment);
         int numBestActions = 0;
         double bestValue = -1000;
-        double EPSILON = 0.0001;
-        for (int i = 0; i < maxActions; i++) {
-            if (actionPossible.test(environment, i)) {
-                S stateAction = stateActionFunction.apply(state, i);
-                double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
-                double diff = Math.abs(value - bestValue);
-                boolean better = value > bestValue && diff >= EPSILON;
-
-                if (better || numBestActions == 0) {
-                    numBestActions = 1;
-                    bestValue = value;
-                } else if (diff < EPSILON) {
-                    numBestActions++;
-                }
-            }
-        }
-        if (numBestActions < 1) {
+        int[] possibleActions = getPossibleActions(environment);
+        if (possibleActions.length == 0) {
             throw new IllegalStateException("No successful action in " + environment + ": " + state);
+        }
+        if (possibleActions.length == 1) {
+            // Only one possible thing to do, no need to perform additional analysis here
+            return possibleActions[0];
+        }
+        for (int i : possibleActions) {
+            S stateAction = stateActionFunction.apply(state, i);
+            double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
+            double diff = Math.abs(value - bestValue);
+            boolean better = value > bestValue && diff >= EPSILON;
+
+            if (better || numBestActions == 0) {
+                numBestActions = 1;
+                bestValue = value;
+            } else if (diff < EPSILON) {
+                numBestActions++;
+            }
         }
 
         int pickedAction = random.nextInt(numBestActions);
-        for (int i = 0; i < maxActions; i++) {
-            if (actionPossible.test(environment, i)) {
-                S stateAction = stateActionFunction.apply(state, i);
-                double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
-                double diff = Math.abs(value - bestValue);
+        for (int i : possibleActions) {
+            S stateAction = stateActionFunction.apply(state, i);
+            double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
+            double diff = Math.abs(value - bestValue);
 
-                if (diff < EPSILON) {
-                    pickedAction--;
-                    if (pickedAction < 0) {
-                        return i;
-                    }
+            if (diff < EPSILON) {
+                pickedAction--;
+                if (pickedAction < 0) {
+                    return i;
                 }
             }
         }
         throw new IllegalStateException("No successful action because of some logic problem.");
     }
 
-    public Map<S, Double> getQTable() {
-        return new HashMap<>(qTable);
+    private int[] getPossibleActions(T environment) {
+        return IntStream.range(0, maxActions)
+                .filter(i -> actionPossible.test(environment, i))
+                .toArray();
     }
 
     public double getLearningRate() {
@@ -188,7 +192,7 @@ public class MyQLearning<T, S> {
         return randomMoveProbability;
     }
 
-    public int getQTableSize() {
+    public long getQTableSize() {
         return this.qTable.size();
     }
 

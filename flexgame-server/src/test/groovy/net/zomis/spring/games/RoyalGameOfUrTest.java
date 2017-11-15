@@ -1,6 +1,10 @@
 package net.zomis.spring.games;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import net.zomis.aiscores.FieldScoreProducer;
 import net.zomis.aiscores.FieldScores;
 import net.zomis.fight.FightInterface;
@@ -9,13 +13,18 @@ import net.zomis.fight.GameFight;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.v2.ActionV2;
 import net.zomis.spring.games.impls.MyQLearning;
+import net.zomis.spring.games.impls.QStoreMongo;
+import net.zomis.spring.games.impls.qlearn.QStore;
+import net.zomis.spring.games.impls.qlearn.QStoreMap;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUr;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrHelper;
+import net.zomis.spring.games.impls.ur.RoyalRLOfUr;
+import org.apache.log4j.LogManager;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs.*;
 import static org.junit.Assert.assertFalse;
@@ -72,7 +81,68 @@ public class RoyalGameOfUrTest {
     }
 
     public static void main(String[] args) {
+
+        LogManager.getLogger("org.mongodb.driver.connection").setLevel(org.apache.log4j.Level.OFF);
+        LogManager.getLogger("org.mongodb.driver.management").setLevel(org.apache.log4j.Level.OFF);
+        LogManager.getLogger("org.mongodb.driver.cluster").setLevel(org.apache.log4j.Level.OFF);
+        LogManager.getLogger("org.mongodb.driver.protocol.insert").setLevel(org.apache.log4j.Level.OFF);
+        LogManager.getLogger("org.mongodb.driver.protocol.command").setLevel(org.apache.log4j.Level.OFF);
+        LogManager.getLogger("org.mongodb.driver.protocol.query").setLevel(org.apache.log4j.Level.OFF);
+        LogManager.getLogger("org.mongodb.driver.protocol.update").setLevel(org.apache.log4j.Level.OFF);
+
+
+        RoyalRLOfUr royalAI = new RoyalRLOfUr();
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
+        RoyalGameOfUrAIs.AI[] players = new RoyalGameOfUrAIs.AI[] {
+            new RoyalGameOfUrAIs.URScorer("Simple1", RoyalGameOfUrAIs.scf()
+            ),
+            royalAI
+        };
+        royalAI.setRecord(true);
+        Scanner scanner = new Scanner(System.in);
+        boolean playing = true;
+        int skip = 0;
+        while (playing) {
+            RoyalGameOfUr game = new RoyalGameOfUr();
+            royalAI.newGame();
+            while (!game.isFinished()) {
+                RoyalGameOfUrAIs.AI player = players[game.getCurrentPlayer()];
+                PlayerInGame pig = new PlayerInGame("", game.getCurrentPlayer(), "", null, player);
+                Optional<ActionV2> result = player.control(game, pig);
+                if (!game.isRollTime()) {
+                //    System.out.println(game);
+                //    System.out.println("AI: " + royalAI.control(game, pig));
+                //    scanner.nextLine();
+                }
+                result.ifPresent(act -> helper.performAction(game, game.getCurrentPlayer(), act.getName(), act.getActionData()));
+            }
+            System.out.println("Winner is " + game.getWinner());
+            royalAI.setWin(game.getWinner() == 1);
+
+
+            String str = "";
+            if (skip <= 0) {
+                System.out.println("What's next?");
+                str = scanner.nextLine();
+            } else {
+                skip--;
+            }
+            if (str.equals("learn")) {
+                royalAI.learn();
+            }
+            if (str.equals("exit")) {
+                playing = false;
+            }
+            if (str.startsWith("play")) {
+                skip = Integer.parseInt(str.substring(5));
+            }
+            if (str.equals("fight")) {
+                royalAI.setRecord(false);
+                new RoyalGameOfUrTest().fightWithAI(royalAI);
+                royalAI.setRecord(true);
+            }
+        }
+        scanner.close();
     }
 
     private static class RoyalQLearn implements AI {
@@ -104,9 +174,27 @@ public class RoyalGameOfUrTest {
 
     @Test
     public void fight() {
+        fightWithAI(new RoyalRLOfUr());
+    }
+
+    static Logger root = (Logger) LoggerFactory
+            .getLogger(Logger.ROOT_LOGGER_NAME);
+
+    static {
+        root.setLevel(Level.INFO);
+    }
+
+    public void fightWithAI(RoyalRLOfUr royalAI) {
+
+        MongoClient mongo = new MongoClient();
+        MongoDatabase db = mongo.getDatabase("flexgame_server");
+
         MyQLearning.ActionPossible<RoyalGameOfUr> actionPossible = (environment, action) ->
             environment.canMove(environment.getCurrentPlayer(), action, environment.getRoll());
-        MyQLearning<RoyalGameOfUr, Long> learn = new MyQLearning<>(15, RoyalGameOfUr::toLong, actionPossible, (state, action) -> state << 4 + action);
+        QStore<Long> qStore = new QStoreMongo<>(db.getCollection("qlearn_ur")); // new QStoreMap<>();
+        // System.out.println(qStore.getOrDefault(new RoyalGameOfUr().toLong(), 0));
+        MyQLearning<RoyalGameOfUr, Long> learn = new MyQLearning<>(15, RoyalGameOfUr::toLong, actionPossible, (state, action) -> state << 4 + action,
+                qStore);
         learn.setLearningRate(0.2);
         learn.setDiscountFactor(0.99);
         learn.setRandomMoveProbability(0.1);
@@ -114,26 +202,32 @@ public class RoyalGameOfUrTest {
 
         GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
-                new RoyalGameOfUrAIs.URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
+                // TODO: Evaluate current position. Calculate likelihood of winning?
+                // Use current positions and likelihood of punishing opponent
+                // Chase AI that follows the opponent no matter the cost (such as opponent has one piece left)
+/*                new RoyalGameOfUrAIs.URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
                         .withScorer(gotoSafety, 0.1)
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -0.1)
-                        .withScorer(exit)),
-                new RoyalGameOfUrAIs.URScorer("KFE521T", RoyalGameOfUrAIs.scf()
+                        .withScorer(exit)),*/
+/*                new RoyalGameOfUrAIs.URScorer("KFE521T", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
                         .withScorer(riskOfBeingTaken, -0.1)
-                        .withScorer(exit)),
-                new RoyalGameOfUrAIs.URScorer("KFE521S3C2", RoyalGameOfUrAIs.scf()
+                        .withScorer(exit)),*/
+
+//                new RoyalGameOfUrAIs.URScorer("Idiot", RoyalGameOfUrAIs.scf()
+//                ),
+                new RoyalGameOfUrAIs.URScorer("Flower", RoyalGameOfUrAIs.scf()
+                        .withScorer(gotoFlower, 2)
+                ),
+/*                new RoyalGameOfUrAIs.URScorer("Knockout", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
-                        .withScorer(gotoSafety, 1)
-                        .withScorer(leaveSafety, -0.1)
-                        .withScorer(riskOfBeingTaken, -0.1)
-                        .withScorer(riskOfBeingTakenHere, 0.5)
-                        .withScorer(exit)),
+                ),
+*/
                 new RoyalGameOfUrAIs.URScorer("KFE521S3C", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
@@ -160,7 +254,13 @@ public class RoyalGameOfUrTest {
         FightInterface<RoyalGameOfUrAIs.AI> strat = new FightInterface<RoyalGameOfUrAIs.AI>() {
             @Override
             public RoyalGameOfUrAIs.AI determineWinner(RoyalGameOfUrAIs.AI[] players, int fightNumber) {
+                if (fightNumber % 10 == 0) {
+                    System.out.println(Arrays.toString(players) + " fighting round " + fightNumber);
+                }
                 RoyalGameOfUr ur = new RoyalGameOfUr();
+//                long startCount = qStore.size();
+//                System.out.println("Start of game: " + startCount);
+//                int steps = 0;
                 while (ur.isRollTime()) {
                     ur.roll();
                 }
@@ -172,20 +272,26 @@ public class RoyalGameOfUrTest {
                     RoyalGameOfUrAIs.AI player = players[ur.getCurrentPlayer()];
                     Optional<ActionV2> result = player.control(ur, new PlayerInGame("", ur.getCurrentPlayer(), "", null, player));
                     // System.out.printf("Result for %d: %s. Values %s", ur.getCurrentPlayer(), result.orElse(null), Arrays.deepToString(ur.getPieces()));
+//                    if (result.isPresent()) {
+//                        steps++;
+//                    }
                     result.ifPresent(act -> learn.step(ur, performAction, act.getActionData().asInt()));
                 }
+//                long endCount = qStore.size();
+//                System.out.println("End of game: " + endCount + " - increase of " + (endCount - startCount));
+//                System.out.println("Steps: " + steps);
                 return players[ur.getWinner()];
             }
         };
 
-        int lastSize;
+        long lastSize;
         do {
             lastSize = learn.getQTableSize();
-            FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 1000, strat);
+            FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 20, strat);
             System.out.println(results.toStringMultiLine());
             System.out.println("States: " + learn.getQTableSize());
 
-            int newStates = learn.getQTableSize() - lastSize;
+            long newStates = learn.getQTableSize() - lastSize;
             System.out.println(newStates + " new states");
         } while (lastSize != learn.getQTableSize());
     }

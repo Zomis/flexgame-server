@@ -1,6 +1,15 @@
 package net.zomis.spring.games;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import net.zomis.spring.games.impls.MyQLearning;
+import net.zomis.spring.games.impls.QStoreMongo;
+import net.zomis.spring.games.impls.qlearn.QStore;
+import net.zomis.spring.games.impls.qlearn.QStoreMap;
+import net.zomis.spring.games.impls.qlearn.TTTQLearn;
 import net.zomis.tttultimate.TTBase;
 import net.zomis.tttultimate.TTFactories;
 import net.zomis.tttultimate.TTPlayer;
@@ -8,68 +17,45 @@ import net.zomis.tttultimate.games.TTClassicController;
 import net.zomis.tttultimate.games.TTController;
 import net.zomis.tttultimate.players.TTAI;
 import net.zomis.tttultimate.players.TTAIFactory;
+import org.bson.Document;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import java.util.Scanner;
-import java.util.function.Function;
+
+import static net.zomis.spring.games.impls.qlearn.TTTQLearn.actionPossible;
+import static net.zomis.spring.games.impls.qlearn.TTTQLearn.performAction;
 
 public class TTTLearning {
 
-    public static void main(String[] args) {
+    static Logger root = (Logger) LoggerFactory
+            .getLogger(Logger.ROOT_LOGGER_NAME);
+
+    static {
+        root.setLevel(Level.INFO);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
         new TTTLearning().playTTT();
     }
 
     @Test
-    public void playTTT() {
-        int sizeX = 3;
-        int sizeY = 3;
-        Function<TTController, String> stateToString = g -> {
-            StringBuilder str = new StringBuilder();
-            for (int y = 0; y < sizeY; y++) {
-                for (int x = 0; x < sizeX; x++) {
-                    TTBase sub = g.getGame().getSub(x, y);
-                    str.append(sub.getWonBy().isExactlyOnePlayer() ? sub.getWonBy().name() : "_");
-                }
-                str.append('-');
-            }
-            return str.toString();
-        };
-        MyQLearning.ActionPossible<TTController> actionPossible = (tt, action) -> {
-            int x = action % 3;
-            int y = action / 3;
-            if (tt.getGame().getSub(x, y) == null) {
-                return false;
-            }
-            return tt.isAllowedPlay(tt.getGame().getSub(x, y));
-        };
-        MyQLearning.PerformAction<TTController> performAction = (tt, action) -> {
-            int x = action % 3;
-            int y = action / 3;
-            TTPlayer player = tt.getCurrentPlayer();
-            tt.play(tt.getGame().getSub(x, y));
-            double reward = 0;
+    public void playTTT() throws InterruptedException {
+        MongoClient client = new MongoClient();
+        MongoDatabase mongoDB = client.getDatabase("flexgame_server");
+        MongoCollection<Document> mongoCollection = mongoDB.getCollection("qlearn_ttt");
+        QStore<String> qStore = new QStoreMongo<>(mongoCollection);
 
-            if (tt.isGameOver() && tt.getWonBy().isExactlyOnePlayer()) {
-                reward = tt.getWonBy().is(player) ? 1 : -1;
-            } else if (isDraw(tt)) {
-                reward = 0;
-            } else {
-                reward = -0.01;
-            }
-            return new MyQLearning.Rewarded<>(tt, reward);
-        };
-        MyQLearning<TTController, String> learn = new MyQLearning<>(9, stateToString, actionPossible, (state, action) -> state + action);
-        // learn.setLearningRate(-0.01); // This leads to bad player moves. Like XOX-OXO-_X_ instead of XOX-OXO-X__
-        learn.setDiscountFactor(-0.9);
-        learn.setLearningRate(1.0);
-        learn.setRandomMoveProbability(1.0);
-
+        MyQLearning<TTController, String> learn = TTTQLearn.newLearner(new QStoreMap<>());
         Scanner scanner = new Scanner(System.in);
         int i = 0;
         int BREAK = 100_000;
         TTPlayer human;
         while (true) {
             i++;
+            System.out.println("Waiting...");
+            scanner.nextLine();
+            System.out.println("Game " + i + " size " + qStore.size());
             if (i % Math.ceil(BREAK / 20d) == 0) {
                 System.out.println(i);
             }
@@ -145,18 +131,6 @@ public class TTTLearning {
                 return -1;
             }
         }
-    }
-
-    private boolean isDraw(TTController tt) {
-        for (int yy = 0; yy < tt.getGame().getSizeY(); yy++) {
-            for (int xx = 0; xx < tt.getGame().getSizeX(); xx++) {
-                TTBase sub = tt.getGame().getSub(xx, yy);
-                if (!sub.isWon()) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private void print(TTController game) {
