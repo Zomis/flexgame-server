@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * AI for Tic-Tac-Toe that always moves according to a set of pre-fixed moves
  */
-public class FixedMoveTTTAI implements PlayerController<TTController> {
+public class FixedMoveTTTAI implements PlayerController<ScoredTTT> {
 
     private final JsonNode config;
 
@@ -20,11 +20,11 @@ public class FixedMoveTTTAI implements PlayerController<TTController> {
     }
 
     @Override
-    public Optional<ActionV2> control(TTController game, PlayerInGame player) {
+    public Optional<ActionV2> control(ScoredTTT game, PlayerInGame player) {
         for (JsonNode node : config.get("moves")) {
             int x = node.get("x").asInt();
             int y = node.get("y").asInt();
-            if (game.getGame().getSub(x, y) == null) {
+            if (game.getCurrent().getGame().getSub(x, y) == null) {
                 return Optional.of(new ActionV2("move", node));
             }
         }

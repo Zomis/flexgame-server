@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
@@ -20,22 +21,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TTTGameH implements GameHelper2<TTController> {
+public class TTTGameH implements GameHelper2<ScoredTTT> {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final Hashids idGenerator = new Hashids(getClass().getSimpleName());
     private final AtomicInteger gameId = new AtomicInteger();
-    private Map<String, TTTQLearn> qaiMap = new HashMap<>();
+    private final JsonNodeFactory nodeFactory = new JsonNodeFactory(false);
+    private Map<String, ScoredTTT.ScoredTTTQLearn> qaiMap = new HashMap<>();
 
     @Override
-    public LobbyGame<TTController> createGame(Object gameConfiguration) {
+    public LobbyGame<ScoredTTT> createGame(Object gameConfiguration) {
         String id = idGenerator.encrypt(gameId.incrementAndGet());
         return new LobbyGame<>(id, new TokenGenerator(), this, gameConfiguration);
     }
     // TODO: Keep score, first player to X (20 or so?) or best of 30 games? Make it a parameter?
 
     @Override
-    public ActionResult playerJoin(LobbyGame<TTController> game, Object playerConfiguration) {
+    public ActionResult playerJoin(LobbyGame<ScoredTTT> game, Object playerConfiguration) {
         if (game.getPlayers().size() < 2) {
             return new ActionResult(true, "OK");
         }
@@ -43,13 +45,13 @@ public class TTTGameH implements GameHelper2<TTController> {
     }
 
     @Override
-    public Optional<PlayerController<TTController>> inviteAI(LobbyGame<TTController> game, String aiName, Object aiConfig, Object playerConfiguration) {
+    public Optional<PlayerController<ScoredTTT>> inviteAI(LobbyGame<ScoredTTT> game, String aiName, Object aiConfig, Object playerConfiguration) {
         if (game.getPlayers().size() >= 2) {
             return Optional.empty();
         }
         if (aiName.startsWith("Q")) {
             MyQLearning<TTController, String> learn = TTTQLearn.newLearner(new QStoreMap<>());
-            qaiMap.putIfAbsent(aiName, new TTTQLearn(learn));
+            qaiMap.putIfAbsent(aiName, new ScoredTTT.ScoredTTTQLearn(learn));
             return Optional.of(qaiMap.get(aiName));
         }
 
@@ -60,20 +62,19 @@ public class TTTGameH implements GameHelper2<TTController> {
     }
 
     @Override
-    public TTController startGame(LobbyGame<TTController> lobbyGame) {
+    public ScoredTTT startGame(LobbyGame<ScoredTTT> lobbyGame) {
         if (lobbyGame.getPlayers().size() != 2) {
             return null;
         }
         // TODO: ? lobbyGame.shufflePlayerOrder();
-        TTController gameObj = TTControllers.classicTTT();
-        return gameObj;
+        return ScoredTTT.of(TTControllers::classicTTT);
     }
 
     @Override
-    public InternalActionResult performAction(RunningGame<TTController> running, PlayerInGame player, String actionType, Object actionData) {
+    public InternalActionResult performAction(RunningGame<ScoredTTT> running, PlayerInGame player, String actionType, Object actionData) {
         switch (actionType) {
             case "move":
-                TTController game = running.getGame();
+                TTController game = running.getGame().getCurrent();
                 Point point = mapper.convertValue(actionData, Point.class);
                 if (game.getCurrentPlayer() == TTPlayer.X ^ player.getIndex() == 0) {
                     return new InternalActionResult(false, "Not your turn");
@@ -83,38 +84,39 @@ public class TTTGameH implements GameHelper2<TTController> {
                     return new InternalActionResult(false, "Position already taken");
                 }
                 // TODO: Use events like `beforeAction` and `afterAction`?
-                Optional<TTTQLearn> qlearn = getQLearn(running);
+                Optional<ScoredTTT.ScoredTTTQLearn> qlearn = getQLearn(running);
                 if (qlearn.isPresent()) {
                     qlearn.get().perform(game, new ActionV2(actionType, (JsonNode) actionData));
                 } else {
                     game.play(game.getGame().getSub(point.x, point.y));
                 }
+                running.getGame().postAction();
                 return new InternalActionResult(true, "");
             default:
                 return new InternalActionResult(false, "Unknown action");
         }
     }
 
-    private Optional<TTTQLearn> getQLearn(RunningGame<TTController> running) {
-        return running.players().filter(p -> p.getController() instanceof TTTQLearn)
-            .map(p -> (TTTQLearn) p.getController())
+    private Optional<ScoredTTT.ScoredTTTQLearn> getQLearn(RunningGame<ScoredTTT> running) {
+        return running.players().filter(p -> p.getController() instanceof ScoredTTT.ScoredTTTQLearn)
+            .map(p -> (ScoredTTT.ScoredTTTQLearn) p.getController())
             .findAny();
     }
 
     @Override
-    public Object gameSummary(RunningGame<TTController> game) {
+    public Object gameSummary(RunningGame<ScoredTTT> game) {
         return new Object();
     }
 
     @Override
-    public Object gameDetails(RunningGame<TTController> game, PlayerInGame fromWhosPerspective) {
-        JsonNodeFactory nodeFactory = new JsonNodeFactory(false);
+    public Object gameDetails(RunningGame<ScoredTTT> game, PlayerInGame fromWhosPerspective) {
+        ObjectNode obj = nodeFactory.objectNode();
         ArrayNode node = nodeFactory.arrayNode(3);
-        TTController board = game.getGame();
+        ScoredTTT board = game.getGame();
         for (int y = 0; y < 3; y++) {
             ArrayNode row = nodeFactory.arrayNode(3);
             for (int x = 0; x < 3; x++) {
-                TTPlayer value = board.getGame().getSub(x, y).getWonBy();
+                TTPlayer value = board.getCurrent().getGame().getSub(x, y).getWonBy();
                 if (value.isExactlyOnePlayer()) {
                     row.add(value.name());
                 } else {
@@ -123,6 +125,10 @@ public class TTTGameH implements GameHelper2<TTController> {
             }
             node.add(row);
         }
-        return node;
+        obj.set("board", node);
+        int[] score = game.getGame().getScore();
+        obj.set("scores", nodeFactory.arrayNode().add(score[0]).add(score[1]));
+        return obj;
     }
+
 }
