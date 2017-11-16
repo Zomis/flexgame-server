@@ -54,7 +54,7 @@ public class TTTQLearn {
         // learn.setLearningRate(-0.01); // This leads to bad player moves. Like XOX-OXO-_X_ instead of XOX-OXO-X__
         learn.setDiscountFactor(-0.9);
         learn.setLearningRate(1.0);
-        learn.setRandomMoveProbability(1.0);
+        learn.setRandomMoveProbability(0.05);
         return learn;
     }
 
