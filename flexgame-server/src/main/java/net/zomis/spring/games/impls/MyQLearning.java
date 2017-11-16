@@ -1,6 +1,8 @@
 package net.zomis.spring.games.impls;
 
 import net.zomis.spring.games.impls.qlearn.QStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -8,6 +10,8 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public class MyQLearning<T, S> {
+
+    private static final Logger logger = LoggerFactory.getLogger(MyQLearning.class);
 
     private static final double DEFAULT_QVALUE = 0;
     private static final double EPSILON = 0.0001;
@@ -112,10 +116,8 @@ public class MyQLearning<T, S> {
         double oldValue = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
         double learnedValue = rewardT + discountFactor * estimateOfOptimalFutureValue;
         double newValue = (1 - learningRate) * oldValue + learningRate * learnedValue;
-        if (debug) {
-            System.out.printf("Performed %d in state %s with reward %f. Old Value %f. Learned %f. New %f%n", action, state, rewardT,
-                oldValue, learnedValue, newValue);
-        }
+        logger.debug("{} Performed {} in state {} with reward {}. Old Value {}. Learned {}. New {}", this, action,
+                state, rewardT, oldValue, learnedValue, newValue);
         this.qTable.put(stateAction, newValue);
         return rewardedState;
     }
@@ -147,6 +149,7 @@ public class MyQLearning<T, S> {
         }
 
         int pickedAction = random.nextInt(numBestActions);
+        logger.debug("Pick best action chosed index {} of {} with value {}", pickedAction, possibleActions, bestValue);
         for (int i : possibleActions) {
             S stateAction = stateActionFunction.apply(state, i);
             double value = qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
