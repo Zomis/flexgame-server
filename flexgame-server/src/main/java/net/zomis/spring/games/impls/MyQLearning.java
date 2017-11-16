@@ -17,13 +17,9 @@ public class MyQLearning<T, S> {
     private static final double EPSILON = 0.0001;
     private double discountFactor = 0.99;
     private double learningRate = 0.01;
-    private boolean debug;
+    private boolean enabled;
     private double randomMoveProbability = 0.0;
     private final Random random = new Random();
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
 
     public interface ActionPossible<T> {
         boolean test(T environment, int action);
@@ -95,6 +91,9 @@ public class MyQLearning<T, S> {
     }
 
     public Rewarded<T> step(T environment, PerformAction<T> performAction, int action) {
+        if (!isEnabled()) {
+            return performAction.apply(environment, action);
+        }
         S state = stateFunction.apply(environment);
         S stateAction = stateActionFunction.apply(state, action);
 
@@ -197,6 +196,14 @@ public class MyQLearning<T, S> {
 
     public long getQTableSize() {
         return this.qTable.size();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
 }
