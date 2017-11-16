@@ -207,7 +207,12 @@ Fxxx  Fx
         int numberHome2 = (int) Arrays.stream(pieces[op]).filter(i -> i == 0).count();
         int numberGoal1 = (int) Arrays.stream(pieces[cp]).filter(i -> i == EXIT).count();
         int numberGoal2 = (int) Arrays.stream(pieces[op]).filter(i -> i == EXIT).count();
-        int dice = getRoll();
+        int dice = getRoll() - 1; // 1..4 --> 0..3
+        if (isFinished()) {
+            dice = 0;
+        } else if (dice < 0 || dice >= 4) {
+            throw new IllegalStateException("Invalid dice value for serializing: " + dice);
+        }
         boolean[] p1 = piecesToArray(pieces[cp]);
         boolean[] p2 = piecesToArray(pieces[op]);
 
