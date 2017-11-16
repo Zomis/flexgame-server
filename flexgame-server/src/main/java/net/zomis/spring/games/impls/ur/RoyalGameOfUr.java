@@ -121,7 +121,14 @@ Fxxx  Fx
     }
 
     public boolean canMove(int playerIndex, int position, int steps) {
-        return canMoveTo(playerIndex, position + steps);
+        boolean hasPieceAtPos = false;
+        for (int pos : getPieces()[playerIndex]) {
+            if (pos == position) {
+                hasPieceAtPos = true;
+                break;
+            }
+        }
+        return hasPieceAtPos && canMoveTo(playerIndex, position + steps);
     }
 
     public boolean move(int playerIndex, int position, int steps) {
