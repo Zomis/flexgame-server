@@ -84,7 +84,7 @@ public class MyQLearning<T, S> {
         }
     }
 
-    private int pickRandomAction(T environment) {
+    public int pickRandomAction(T environment) {
         int[] possibleActions = getPossibleActions(environment);
         int actionIndex = random.nextInt(possibleActions.length);
         return possibleActions[actionIndex];
@@ -134,7 +134,7 @@ public class MyQLearning<T, S> {
         return result;
     }
 
-    private int pickBestAction(T environment) {
+    public int pickBestAction(T environment) {
         S state = stateFunction.apply(environment);
         int numBestActions = 0;
         double bestValue = -1000;
