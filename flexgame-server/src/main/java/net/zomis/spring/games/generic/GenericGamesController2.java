@@ -107,6 +107,12 @@ public class GenericGamesController2 implements InitializingBean {
         return delegate(gameType).aiMove(game);
     }
 
+    @RequestMapping(value = "/{gameType}/{game}/aiMoveDetails/{ai}", method = RequestMethod.GET)
+    public ResponseEntity<Object> aiDetails(@PathVariable("gameType") String gameType, @PathVariable("game") String game,
+            @PathVariable("ai") String aiName) {
+        return delegate(gameType).aiDetails(game, aiName);
+    }
+
     @RequestMapping(value = "/{gameType}/{game}/actions/{type}", method = RequestMethod.POST)
     public ResponseEntity<ActionResult> action(@PathVariable("gameType") String gameType, @PathVariable("game") String game,
              @PathVariable("type") String type,

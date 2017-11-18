@@ -121,6 +121,19 @@ public class MyQLearning<T, S> {
         return rewardedState;
     }
 
+    public double[] getActionScores(T environment) {
+        S state = stateFunction.apply(environment);
+        double[] result = new double[maxActions];
+        for (int i = 0; i < maxActions; i++) {
+            if (actionPossible.test(environment, i)) {
+                S st = stateActionFunction.apply(state, i);
+                double value = qTable.getOrDefault(st, 0);
+                result[i] = value;
+            }
+        }
+        return result;
+    }
+
     private int pickBestAction(T environment) {
         S state = stateFunction.apply(environment);
         int numBestActions = 0;
@@ -206,4 +219,11 @@ public class MyQLearning<T, S> {
         return enabled;
     }
 
+    public int getMaxActions() {
+        return maxActions;
+    }
+
+    public boolean isActionPossible(T environment, int action) {
+        return this.actionPossible.test(environment, action);
+    }
 }

@@ -9,8 +9,7 @@ import net.zomis.spring.games.impls.qlearn.TTTQLearn;
 import net.zomis.tttultimate.TTPlayer;
 import net.zomis.tttultimate.games.TTController;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static net.zomis.spring.games.impls.qlearn.TTTQLearn.isDraw;
@@ -51,7 +50,7 @@ public class ScoredTTT {
         return Arrays.copyOf(score, score.length);
     }
 
-    public static class ScoredTTTQLearn implements PlayerController<ScoredTTT> {
+    public static class ScoredTTTQLearn implements PlayerController<ScoredTTT>, Queryable<ScoredTTT> {
 
         public ScoredTTTQLearn(MyQLearning<TTController, String> learner) {
             this.learner = learner;
@@ -70,12 +69,17 @@ public class ScoredTTT {
                 return Optional.empty();
             }
             int action = learner.pickAction(game);
+            ActionV2 actionV2 = actionToActionV2(action);
+            return Optional.of(actionV2);
+        }
+
+        private ActionV2 actionToActionV2(int action) {
             int x = action % 3;
             int y = action / 3;
             ObjectNode obj = nodeFactory.objectNode();
             obj.set("x", nodeFactory.numberNode(x));
             obj.set("y", nodeFactory.numberNode(y));
-            return Optional.of(new ActionV2("move", obj));
+            return new ActionV2("move", obj);
         }
 
         public void perform(TTController game, ActionV2 action) {
@@ -84,6 +88,18 @@ public class ScoredTTT {
             learner.step(game, performAction, y * 3 + x);
         }
 
+        @Override
+        public Collection<ActionScore> query(ScoredTTT scored) {
+            TTController current = scored.getCurrent();
+            double[] value = learner.getActionScores(current);
+            Collection<ActionScore> result = new ArrayList<>();
+            for (int i = 0; i < learner.getMaxActions(); i++) {
+                if (learner.isActionPossible(current, i)) {
+                    result.add(new ActionScore(actionToActionV2(i), value[i]));
+                }
+            }
+            return result;
+        }
     }
 
 }

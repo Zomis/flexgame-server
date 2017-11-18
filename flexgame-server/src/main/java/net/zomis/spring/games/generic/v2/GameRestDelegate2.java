@@ -6,6 +6,7 @@ import net.zomis.spring.games.generic.Action;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
 import net.zomis.spring.games.generic.v2.*;
+import net.zomis.spring.games.impls.Queryable;
 import net.zomis.spring.games.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +162,19 @@ public class GameRestDelegate2<G> {
                 controller, act.getName(), gameId, aiPlayer.get().getIndex(), act.getActionData(), actionResult));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(actionResult.toActionResult());
+    }
+
+    public ResponseEntity<Object> aiDetails(String gameId, String aiName) {
+        RunningGame<G> game = runningGames.get(gameId);
+        Optional<PlayerInGame> ai = game.players().filter(pig -> pig.getController() instanceof Queryable)
+                .filter(pig -> pig.getName().equals(aiName))
+                .findAny();
+        if (!ai.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        PlayerController controller = ai.get().getController();
+        Queryable<G> queryable = (Queryable<G>) controller;
+        return ResponseEntity.ok(queryable.query(game.getGame()));
     }
 
 }
