@@ -49,21 +49,27 @@ public class RoyalGameOfUrFightStats {
 
         StatsExtract<List<RoyalGameOfUrAIs.AI>> se = StatsExtract.create();
         se
-            .indexes("winner", "loser")
+            .indexes("player1", "player2")
             .data("gameOver", RoyalGameOfUr.class, (stats, ur, obj) -> {
                 int winner = ur.getWinner();
                 List<RoyalGameOfUrAIs.AI> ais = stats.getCurrent();
-                stats.<Integer>index("winner", savedKey -> ais.get(savedKey == winner ? winner : 1 - winner));
-                stats.<Integer>index("loser",  savedKey -> ais.get(savedKey != winner ? winner : 1 - winner));
+//                stats.<Integer>index("winner", savedKey -> ais.get(savedKey == winner ? winner : 1 - winner));
+//                stats.<Integer>index("loser",  savedKey -> ais.get(savedKey != winner ? winner : 1 - winner));
+                stats.<Integer>index("player1", ai -> ais.get(ai));
+                stats.<Integer>index("player2", ai -> ais.get(1 - ai));
                 stats.save("winResult", winner, WinResult.WIN);
+                stats.save("winResult", 1 - winner, WinResult.LOSS);
             })
             .value("winResult", WinResult.class, FightCollectors.stats())
             .value("knockouts", Integer.class, Collectors.summarizingInt(i -> i))
+            .value("knockouted", Integer.class, Collectors.summarizingInt(i -> i))
             .dataTuple("preMove", RoyalGameOfUr.class, Integer.class,
                 (stats, ur, action) -> {
                     int op = 1 - ur.getCurrentPlayer();
                     boolean isKnockout = ur.canKnockout(action + ur.getRoll()) && ur.playerOccupies(op, action + ur.getRoll());
-                    stats.save("knockouts", ur.getCurrentPlayer(), isKnockout ? 1 : 0);
+                    int knockoutValue = isKnockout ? 1 : 0;
+                    stats.save("knockouts", ur.getCurrentPlayer(), knockoutValue);
+                    stats.save("knockouted", 1 - ur.getCurrentPlayer(), knockoutValue);
                 });
         return se;
     }
