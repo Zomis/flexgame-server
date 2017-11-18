@@ -226,4 +226,15 @@ public class MyQLearning<T, S> {
     public boolean isActionPossible(T environment, int action) {
         return this.actionPossible.test(environment, action);
     }
+
+    @Override
+    public String toString() {
+        return "MyQLearning{" +
+                "maxActions=" + maxActions +
+                ", enabled=" + enabled +
+                ", discountFactor=" + discountFactor +
+                ", learningRate=" + learningRate +
+                ", randomMoveProbability=" + randomMoveProbability +
+                '}';
+    }
 }
