@@ -7,19 +7,21 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import net.zomis.aiscores.FieldScoreProducer;
 import net.zomis.aiscores.FieldScores;
-import net.zomis.fight.FightInterface;
-import net.zomis.fight.FightResults;
 import net.zomis.fight.GameFight;
+import net.zomis.fight.v2.IndexResults;
+import net.zomis.fight.v2.StatsFight;
+import net.zomis.fight.v2.StatsInterface;
+import net.zomis.fight.v2.StatsPerform;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.v2.ActionV2;
 import net.zomis.spring.games.impls.MyQLearning;
 import net.zomis.spring.games.impls.QStoreMongo;
 import net.zomis.spring.games.impls.qlearn.QStore;
-import net.zomis.spring.games.impls.qlearn.QStoreMap;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUr;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrHelper;
 import net.zomis.spring.games.impls.ur.RoyalRLOfUr;
+import net.zomis.spring.games.ur.RoyalGameOfUrFightStats;
 import org.apache.log4j.LogManager;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
@@ -251,44 +253,48 @@ public class RoyalGameOfUrTest {
             double discountFactor = currentPlayer == nextPlayer ? learn.getDiscountFactor() : learn.getDiscountFactor() * -1;
             return new MyQLearning.Rewarded<>(state, reward).withDiscountFactor(discountFactor);
         };
-        FightInterface<RoyalGameOfUrAIs.AI> strat = new FightInterface<RoyalGameOfUrAIs.AI>() {
+        StatsPerform<List<RoyalGameOfUrAIs.AI>> strat = new StatsPerform<List<RoyalGameOfUrAIs.AI>>() {
             @Override
-            public RoyalGameOfUrAIs.AI determineWinner(RoyalGameOfUrAIs.AI[] players, int fightNumber) {
-                if (fightNumber % 10 == 0) {
-                    System.out.println(Arrays.toString(players) + " fighting round " + fightNumber);
+            public void perform(StatsInterface stats, List<RoyalGameOfUrAIs.AI> players, int number) {
+                if (number % 20 == 0) {
+                    System.out.println(players + " fighting round " + number);
                 }
                 RoyalGameOfUr ur = new RoyalGameOfUr();
-//                long startCount = qStore.size();
-//                System.out.println("Start of game: " + startCount);
-//                int steps = 0;
                 while (ur.isRollTime()) {
-                    ur.roll();
+                    int cp = ur.getCurrentPlayer();
+                    int roll = ur.roll();
+                    stats.postTuple("roll", cp, roll);
                 }
                 while (!ur.isFinished()) {
                     if (!ur.isMoveTime()) {
                         throw new IllegalStateException("NOT MOVE TIME!");
                     }
 
-                    RoyalGameOfUrAIs.AI player = players[ur.getCurrentPlayer()];
+                    RoyalGameOfUrAIs.AI player = players.get(ur.getCurrentPlayer());
                     Optional<ActionV2> result = player.control(ur, new PlayerInGame("", ur.getCurrentPlayer(), "", null, player));
                     // System.out.printf("Result for %d: %s. Values %s", ur.getCurrentPlayer(), result.orElse(null), Arrays.deepToString(ur.getPieces()));
-//                    if (result.isPresent()) {
-//                        steps++;
-//                    }
-                    result.ifPresent(act -> learn.step(ur, performAction, act.getActionData().asInt()));
+                    result.ifPresent(act -> {
+                        int actionValue = act.getActionData().asInt();
+                        stats.postTuple("preMove", ur, actionValue);
+                        MyQLearning.Rewarded<RoyalGameOfUr> reward = learn.step(ur, performAction, actionValue);
+                        stats.post("q-reward", reward.getReward());
+                    });
                 }
-//                long endCount = qStore.size();
-//                System.out.println("End of game: " + endCount + " - increase of " + (endCount - startCount));
-//                System.out.println("Steps: " + steps);
-                return players[ur.getWinner()];
+                stats.post("gameOver", ur);
+                stats.post("winner", ur.getWinner());
+                stats.post("loser", 1 - ur.getWinner());
             }
         };
 
         long lastSize;
         do {
             lastSize = learn.getQTableSize();
-            FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 20, strat);
-            System.out.println(results.toStringMultiLine());
+            List<RoyalGameOfUrAIs.AI> aiList = Arrays.asList(ais);
+
+            IndexResults results = StatsFight.fightEvently(aiList, 1000, strat, RoyalGameOfUrFightStats.urStats());
+
+            // FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 1000, strat);
+            System.out.println(results.toMultiline());
             System.out.println("States: " + learn.getQTableSize());
 
             long newStates = learn.getQTableSize() - lastSize;
