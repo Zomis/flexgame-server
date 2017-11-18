@@ -17,7 +17,7 @@ public class MyQLearning<T, S> {
     private static final double EPSILON = 0.0001;
     private double discountFactor = 0.99;
     private double learningRate = 0.01;
-    private boolean enabled;
+    private boolean enabled = true;
     private double randomMoveProbability = 0.0;
     private final Random random = new Random();
 
