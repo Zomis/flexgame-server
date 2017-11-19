@@ -4,6 +4,7 @@ import net.zomis.spring.games.impls.qlearn.QStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -132,6 +133,54 @@ public class MyQLearning<T, S> {
             }
         }
         return result;
+    }
+
+    /**
+     * See {@link #pickWeightedBestAction(Object, double)} with a bonus of zero
+     * @param environment Environment
+     * @return Weighted random action based on score
+     */
+    public int pickWeightedBestAction(T environment) {
+        return pickWeightedBestAction(environment, 0);
+    }
+
+    /**
+     * Calculates the difference between each action score and the lowest score, then picks an action weighted randomly
+     * @param environment Environment to pick an action in
+     * @param bonus bonus to add to all actions, for more randomness. Negative value will lead to a preference towards the first action
+     * @return Weighted random action based on score
+     */
+    public int pickWeightedBestAction(T environment, double bonus) {
+        S state = stateFunction.apply(environment);
+        int[] possibleActions = getPossibleActions(environment);
+        if (possibleActions.length == 0) {
+            throw new IllegalStateException("No successful action in " + environment + ": " + state);
+        }
+        double[] scores = new double[possibleActions.length];
+        for (int i = 0; i < possibleActions.length; i++) {
+            int action = possibleActions[i];
+            S stateAction = stateActionFunction.apply(state, action);
+            scores[i] = this.qTable.getOrDefault(stateAction, DEFAULT_QVALUE);
+        }
+        double min = Arrays.stream(scores).min().orElse(0);
+        double sum = 0;
+        for (int i = 0; i < scores.length; i++) {
+            scores[i] = scores[i] - min + bonus;
+            sum += scores[i];
+        }
+
+        if (sum == 0.0) {
+            int randomIndex = random.nextInt(possibleActions.length);
+            return possibleActions[randomIndex];
+        }
+        double limit = random.nextDouble() * sum;
+        for (int i = 0; i < possibleActions.length; i++) {
+            limit -= scores[i];
+            if (limit < 0) {
+                return possibleActions[i];
+            }
+        }
+        throw new IllegalStateException("No successful action because of some logic problem.");
     }
 
     public int pickBestAction(T environment) {

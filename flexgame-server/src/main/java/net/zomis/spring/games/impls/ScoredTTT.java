@@ -68,7 +68,7 @@ public class ScoredTTT {
             if (game.isGameOver() || TTTQLearn.isDraw(game)) {
                 return Optional.empty();
             }
-            int action = learner.pickAction(game);
+            int action = learner.pickWeightedBestAction(game);
             ActionV2 actionV2 = actionToActionV2(action);
             return Optional.of(actionV2);
         }
