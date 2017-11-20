@@ -200,6 +200,7 @@ public class RoyalGameOfUrTest {
         learn.setLearningRate(0.2);
         learn.setDiscountFactor(0.99);
         learn.setRandomMoveProbability(0.1);
+        learn.setEnabled(false);
         RoyalQLearn royalQ = new RoyalQLearn(learn);
 
         GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
@@ -214,22 +215,16 @@ public class RoyalGameOfUrTest {
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -0.1)
                         .withScorer(exit)),*/
-/*                new RoyalGameOfUrAIs.URScorer("KFE521T", RoyalGameOfUrAIs.scf()
+                new RoyalGameOfUrAIs.URScorer("KFE521T", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
                         .withScorer(riskOfBeingTaken, -0.1)
-                        .withScorer(exit)),*/
-
-//                new RoyalGameOfUrAIs.URScorer("Idiot", RoyalGameOfUrAIs.scf()
-//                ),
-                new RoyalGameOfUrAIs.URScorer("Flower", RoyalGameOfUrAIs.scf()
-                        .withScorer(gotoFlower, 2)
-                ),
-/*                new RoyalGameOfUrAIs.URScorer("Knockout", RoyalGameOfUrAIs.scf()
+                        .withScorer(exit)),
+                new RoyalGameOfUrAIs.URScorer("KFE521T2", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
-                ),
-*/
+                        .withScorer(riskOfBeingTaken, -0.1)
+                        .withScorer(exit)),
                 new RoyalGameOfUrAIs.URScorer("KFE521S3C", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
@@ -237,7 +232,7 @@ public class RoyalGameOfUrTest {
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -3)
                         .withScorer(exit)),
-                royalQ,
+            //    royalQ,
         };
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
         JsonNodeFactory factory = new JsonNodeFactory(false);
