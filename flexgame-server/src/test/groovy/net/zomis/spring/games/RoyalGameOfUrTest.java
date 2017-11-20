@@ -7,7 +7,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import net.zomis.aiscores.FieldScoreProducer;
 import net.zomis.aiscores.FieldScores;
-import net.zomis.fight.GameFight;
 import net.zomis.fight.v2.IndexResults;
 import net.zomis.fight.v2.StatsFight;
 import net.zomis.fight.v2.StatsInterface;
@@ -17,10 +16,7 @@ import net.zomis.spring.games.generic.v2.ActionV2;
 import net.zomis.spring.games.impls.MyQLearning;
 import net.zomis.spring.games.impls.QStoreMongo;
 import net.zomis.spring.games.impls.qlearn.QStore;
-import net.zomis.spring.games.impls.ur.RoyalGameOfUr;
-import net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs;
-import net.zomis.spring.games.impls.ur.RoyalGameOfUrHelper;
-import net.zomis.spring.games.impls.ur.RoyalRLOfUr;
+import net.zomis.spring.games.impls.ur.*;
 import net.zomis.spring.games.ur.RoyalGameOfUrFightStats;
 import org.apache.log4j.LogManager;
 import org.junit.Test;
@@ -33,6 +29,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 public class RoyalGameOfUrTest {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RoyalGameOfUrTest.class);
 
     @Test
     public void cannotMoveSkipTurn() {
@@ -203,6 +201,12 @@ public class RoyalGameOfUrTest {
         learn.setEnabled(false);
         RoyalQLearn royalQ = new RoyalQLearn(learn);
 
+        URScorer bestAI = new URScorer("KFE521T", RoyalGameOfUrAIs.scf()
+                .withScorer(knockout, 5)
+                .withScorer(gotoFlower, 2)
+                .withScorer(riskOfBeingTaken, -0.1)
+                .withScorer(exit));
+
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
                 // TODO: Evaluate current position. Calculate likelihood of winning?
                 // Use current positions and likelihood of punishing opponent
@@ -214,11 +218,6 @@ public class RoyalGameOfUrTest {
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -0.1)
                         .withScorer(exit)),*/
-                new RoyalGameOfUrAIs.URScorer("KFE521T", RoyalGameOfUrAIs.scf()
-                        .withScorer(knockout, 5)
-                        .withScorer(gotoFlower, 2)
-                        .withScorer(riskOfBeingTaken, -0.1)
-                        .withScorer(exit)),
                 new RoyalGameOfUrAIs.URScorer("KFE521T2", RoyalGameOfUrAIs.scf()
                         .withScorer(knockout, 5)
                         .withScorer(gotoFlower, 2)
@@ -231,6 +230,8 @@ public class RoyalGameOfUrTest {
                         .withScorer(leaveSafety, -0.1)
                         .withScorer(riskOfBeingTaken, -3)
                         .withScorer(exit)),
+                bestAI,
+                new MonteCarloAI(1000, bestAI),
             //    royalQ,
         };
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
@@ -250,7 +251,7 @@ public class RoyalGameOfUrTest {
         StatsPerform<List<RoyalGameOfUrAIs.AI>> strat = new StatsPerform<List<RoyalGameOfUrAIs.AI>>() {
             @Override
             public void perform(StatsInterface stats, List<RoyalGameOfUrAIs.AI> players, int number) {
-                if (number % 20 == 0) {
+                if (number % 1 == 0) {
                     System.out.println(players + " fighting round " + number);
                 }
                 RoyalGameOfUr ur = new RoyalGameOfUr();
@@ -277,6 +278,7 @@ public class RoyalGameOfUrTest {
                 stats.post("gameOver", ur);
                 stats.post("winner", ur.getWinner());
                 stats.post("loser", 1 - ur.getWinner());
+                logger.info("{} resulted in win for {}", ur, players.get(ur.getWinner()));
             }
         };
 
@@ -285,7 +287,7 @@ public class RoyalGameOfUrTest {
             lastSize = learn.getQTableSize();
             List<RoyalGameOfUrAIs.AI> aiList = Arrays.asList(ais);
 
-            IndexResults results = StatsFight.fightEvently(aiList, 1000, strat, RoyalGameOfUrFightStats.urStats());
+            IndexResults results = StatsFight.fightEvently(aiList, 100, strat, RoyalGameOfUrFightStats.urStats());
 
             // FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 1000, strat);
             System.out.println(results.toMultiline());

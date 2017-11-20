@@ -266,4 +266,8 @@ Fxxx  Fx
         return str.toString();
     }
 
+    public RoyalGameOfUr copy() {
+        return new RoyalGameOfUr(this.currentPlayer, this.roll, getPiecesCopy());
+    }
+
 }
