@@ -60,8 +60,15 @@ public class RoyalGameOfUrFightStats {
                 stats.<Integer>index("player2", ai -> ais.get(1 - ai));
                 stats.save("winResult", winner, WinResult.WIN);
                 stats.save("winResult", 1 - winner, WinResult.LOSS);
+                int winnerSum = Arrays.stream(ur.getPieces()[winner]).sum();
+                int loserSum = Arrays.stream(ur.getPieces()[1 - winner]).sum();
+                int diff = winnerSum - loserSum;
+                stats.save("winDiff", winner, diff);
+                stats.save("loseDiff", 1 - winner, diff);
             })
             .value("winResult", WinResult.class, FightCollectors.stats())
+            .value("winDiff", Integer.class, ints)
+            .value("loseDiff", Integer.class, ints)
             .valueAndThen("move", Integer.class, ints, sumPerGame)
             .valueAndThen("knockouts", Integer.class, ints, sumPerGame)
             .valueAndThen("knockouted", Integer.class, ints, sumPerGame)
