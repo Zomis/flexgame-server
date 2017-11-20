@@ -7,8 +7,11 @@ import net.zomis.fight.v2.StatsFight;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUr;
 import net.zomis.spring.games.impls.ur.RoyalGameOfUrAIs;
 
+import java.util.Arrays;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,17 +20,13 @@ public class RoyalGameOfUrFightStats {
 
     // Game, Player index, result
     BiFunction<RoyalGameOfUr, Integer, List<Integer>> tilesMostOccupied; // Tag "postMove"
-    BiFunction<RoyalGameOfUr, Integer, Integer> piecesOnBoard;
     BiFunction<RoyalGameOfUr, Integer, Integer> piecesAhead;
     BiFunction<RoyalGameOfUr, Integer, Integer> piecesBehind; // one int for each piece, for each postMove, for each game
 
 
     // Average QLearn move score
     ToIntBiFunction<RoyalGameOfUr, Integer> averageMoveScore; // tag "move", tuple
-    BiPredicate<RoyalGameOfUr, Integer> knockoutCount; // tag "move", tuple
-    BiPredicate<RoyalGameOfUr, Integer> flower; // tag "move", tuple
     BiPredicate<RoyalGameOfUr, Integer> unableToMove; // tag "move", tuple
-    ToIntFunction<RoyalGameOfUr> totalMoves; // must probably be tagged "move"
 
     ToIntBiFunction<RoyalGameOfUr, Integer> helpfulThrows; // tag "roll", tuple with player. Count possible knockouts, flowers, go safes
     ToIntBiFunction<RoyalGameOfUr, Integer> possibleMoves; // tag "preMove", tuple with player.
@@ -46,10 +45,12 @@ public class RoyalGameOfUrFightStats {
 
     public static StatsExtract<List<RoyalGameOfUrAIs.AI>> urStats() {
         // Old fight system was basically: index - player1, index - player2, Win/Lose/Draw
-
+        Collector<Integer, ?, IntSummaryStatistics> ints = Collectors.summarizingInt(i -> i);
+        Collector<IntSummaryStatistics, ?, IntSummaryStatistics> sumPerGame = Collectors.summarizingInt(is -> (int)is.getSum());
         StatsExtract<List<RoyalGameOfUrAIs.AI>> se = StatsExtract.create();
         se
             .indexes("player1", "player2")
+//            .indexes("winner", "loser")
             .data("gameOver", RoyalGameOfUr.class, (stats, ur, obj) -> {
                 int winner = ur.getWinner();
                 List<RoyalGameOfUrAIs.AI> ais = stats.getCurrent();
@@ -61,8 +62,12 @@ public class RoyalGameOfUrFightStats {
                 stats.save("winResult", 1 - winner, WinResult.LOSS);
             })
             .value("winResult", WinResult.class, FightCollectors.stats())
-            .value("knockouts", Integer.class, Collectors.summarizingInt(i -> i))
-            .value("knockouted", Integer.class, Collectors.summarizingInt(i -> i))
+            .valueAndThen("move", Integer.class, ints, sumPerGame)
+            .valueAndThen("knockouts", Integer.class, ints, sumPerGame)
+            .valueAndThen("knockouted", Integer.class, ints, sumPerGame)
+            .valueAndThen("moveToFlower", Integer.class, ints, sumPerGame)
+            .valueAndThen("moveFromFlower", Integer.class, ints, sumPerGame)
+            .value("piecesInGame", Integer.class, ints)
             .dataTuple("preMove", RoyalGameOfUr.class, Integer.class,
                 (stats, ur, action) -> {
                     int op = 1 - ur.getCurrentPlayer();
@@ -70,6 +75,12 @@ public class RoyalGameOfUrFightStats {
                     int knockoutValue = isKnockout ? 1 : 0;
                     stats.save("knockouts", ur.getCurrentPlayer(), knockoutValue);
                     stats.save("knockouted", 1 - ur.getCurrentPlayer(), knockoutValue);
+
+                    boolean isFlower = ur.isFlower(action + ur.getRoll());
+                    stats.save("move", ur.getCurrentPlayer(), 1);
+                    stats.save("piecesInGame", ur.getCurrentPlayer(), (int) Arrays.stream(ur.getPieces()[ur.getCurrentPlayer()]).filter(i -> i > 0 && i < RoyalGameOfUr.EXIT).count());
+                    stats.save("moveToFlower", ur.getCurrentPlayer(), isFlower ? 1 : 0);
+                    stats.save("moveFromFlower", ur.getCurrentPlayer(), ur.isFlower(action) ? 1 : 0);
                 });
         return se;
     }

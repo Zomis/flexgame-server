@@ -203,7 +203,6 @@ public class RoyalGameOfUrTest {
         learn.setEnabled(false);
         RoyalQLearn royalQ = new RoyalQLearn(learn);
 
-        GameFight<RoyalGameOfUrAIs.AI> fight = new GameFight<>("UR");
         RoyalGameOfUrAIs.AI[] ais = new RoyalGameOfUrAIs.AI[] {
                 // TODO: Evaluate current position. Calculate likelihood of winning?
                 // Use current positions and likelihood of punishing opponent
