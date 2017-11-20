@@ -60,21 +60,32 @@ public class RoyalGameOfUrFightStats {
                 stats.<Integer>index("player2", ai -> ais.get(1 - ai));
                 stats.save("winResult", winner, WinResult.WIN);
                 stats.save("winResult", 1 - winner, WinResult.LOSS);
+
+                int unfinishedPieceCount = (int) Arrays.stream(ur.getPieces()[1 - winner]).filter(i -> i < RoyalGameOfUr.EXIT).count();
+                stats.save("unfinishedCount", 1 - winner, unfinishedPieceCount);
+
                 int winnerSum = Arrays.stream(ur.getPieces()[winner]).sum();
                 int loserSum = Arrays.stream(ur.getPieces()[1 - winner]).sum();
                 int diff = winnerSum - loserSum;
+                stats.save("history", 0, "-Winner" + winner + " ");
                 stats.save("winDiff", winner, diff);
                 stats.save("loseDiff", 1 - winner, diff);
             })
             .value("winResult", WinResult.class, FightCollectors.stats())
+            .value("unfinishedCount", Integer.class, ints)
             .value("winDiff", Integer.class, ints)
             .value("loseDiff", Integer.class, ints)
+            .value("history", CharSequence.class, Collectors.joining())
             .valueAndThen("move", Integer.class, ints, sumPerGame)
             .valueAndThen("knockouts", Integer.class, ints, sumPerGame)
             .valueAndThen("knockouted", Integer.class, ints, sumPerGame)
             .valueAndThen("moveToFlower", Integer.class, ints, sumPerGame)
             .valueAndThen("moveFromFlower", Integer.class, ints, sumPerGame)
             .value("piecesInGame", Integer.class, ints)
+            .dataTuple("roll", Integer.class, Integer.class,
+                (stats, player, roll) -> {
+                    stats.save("history", 0, String.valueOf((char) ('A' + roll)));
+                })
             .dataTuple("preMove", RoyalGameOfUr.class, Integer.class,
                 (stats, ur, action) -> {
                     int op = 1 - ur.getCurrentPlayer();
@@ -82,6 +93,7 @@ public class RoyalGameOfUrFightStats {
                     int knockoutValue = isKnockout ? 1 : 0;
                     stats.save("knockouts", ur.getCurrentPlayer(), knockoutValue);
                     stats.save("knockouted", 1 - ur.getCurrentPlayer(), knockoutValue);
+                    stats.save("history", 0, Integer.toString(action, 16));
 
                     boolean isFlower = ur.isFlower(action + ur.getRoll());
                     stats.save("move", ur.getCurrentPlayer(), 1);

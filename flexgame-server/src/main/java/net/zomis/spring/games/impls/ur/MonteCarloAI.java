@@ -46,12 +46,18 @@ public class MonteCarloAI extends RoyalAI {
                 best = expectedWin;
             }
         }
+        int aiResult = ai.positionToMove(game);
+        if (aiResult != bestAction) {
+            logger.warn("Monte Carlo returned different result than its simulation AI in state {}." +
+                " AI {} - Monte Carlo {}", game, aiResult, bestAction);
+        }
         return bestAction;
     }
 
     private double fight(RoyalGameOfUr game, int me) {
         Collector<WinResult, ?, WinStats> collector = FightCollectors.stats();
         return IntStream.range(0, this.fights)
+            .parallel()
             .mapToObj(i -> singleFight(game.copy(), me))
             .collect(collector)
             .getPercentage();

@@ -7,10 +7,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import net.zomis.aiscores.FieldScoreProducer;
 import net.zomis.aiscores.FieldScores;
-import net.zomis.fight.v2.IndexResults;
-import net.zomis.fight.v2.StatsFight;
-import net.zomis.fight.v2.StatsInterface;
-import net.zomis.fight.v2.StatsPerform;
+import net.zomis.fight.v2.*;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.v2.ActionV2;
 import net.zomis.spring.games.impls.MyQLearning;
@@ -236,21 +233,23 @@ public class RoyalGameOfUrTest {
         };
         RoyalGameOfUrHelper helper = new RoyalGameOfUrHelper();
         JsonNodeFactory factory = new JsonNodeFactory(false);
-        MyQLearning.PerformAction<RoyalGameOfUr> performAction = (state, action) -> {
-            int currentPlayer = state.getCurrentPlayer();
-            helper.performAction(state, state.getCurrentPlayer(), "move", factory.numberNode(action));
-            while (!state.isFinished() && state.isRollTime()) {
-                state.roll();
-            }
-            int nextPlayer = state.getCurrentPlayer();
-
-            double reward = state.isFinished() ? state.getWinner() == currentPlayer ? 10 : -10 : -0.01;
-            double discountFactor = currentPlayer == nextPlayer ? learn.getDiscountFactor() : learn.getDiscountFactor() * -1;
-            return new MyQLearning.Rewarded<>(state, reward).withDiscountFactor(discountFactor);
-        };
         StatsPerform<List<RoyalGameOfUrAIs.AI>> strat = new StatsPerform<List<RoyalGameOfUrAIs.AI>>() {
             @Override
             public void perform(StatsInterface stats, List<RoyalGameOfUrAIs.AI> players, int number) {
+                MyQLearning.PerformAction<RoyalGameOfUr> performAction = (state, action) -> {
+                    int currentPlayer = state.getCurrentPlayer();
+                    helper.performAction(state, state.getCurrentPlayer(), "move", factory.numberNode(action));
+                    while (!state.isFinished() && state.isRollTime()) {
+                        int rollPlayer = state.getCurrentPlayer();
+                        int rollResult = state.roll();
+                        stats.postTuple("roll", rollPlayer, rollResult);
+                    }
+                    int nextPlayer = state.getCurrentPlayer();
+
+                    double reward = state.isFinished() ? state.getWinner() == currentPlayer ? 10 : -10 : -0.01;
+                    double discountFactor = currentPlayer == nextPlayer ? learn.getDiscountFactor() : learn.getDiscountFactor() * -1;
+                    return new MyQLearning.Rewarded<>(state, reward).withDiscountFactor(discountFactor);
+                };
                 if (number % 1 == 0) {
                     System.out.println(players + " fighting round " + number);
                 }
@@ -287,7 +286,7 @@ public class RoyalGameOfUrTest {
             lastSize = learn.getQTableSize();
             List<RoyalGameOfUrAIs.AI> aiList = Arrays.asList(ais);
 
-            IndexResults results = StatsFight.fightEvently(aiList, 100, strat, RoyalGameOfUrFightStats.urStats());
+            IndexResults results = StatsFight.fightEvently(aiList, 10, strat, RoyalGameOfUrFightStats.urStats());
 
             // FightResults<RoyalGameOfUrAIs.AI> results = fight.fightEvenly(ais, 1000, strat);
             System.out.println(results.toMultiline());
