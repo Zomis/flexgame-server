@@ -5,16 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import net.zomis.spring.games.Hashids;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.TokenGenerator;
 import net.zomis.spring.games.generic.v2.*;
+import net.zomis.spring.games.impls.qlearn.QStore;
 import net.zomis.spring.games.impls.qlearn.QStoreMap;
 import net.zomis.spring.games.impls.qlearn.TTTQLearn;
 import net.zomis.tttultimate.TTBase;
 import net.zomis.tttultimate.TTPlayer;
 import net.zomis.tttultimate.games.TTController;
 import net.zomis.tttultimate.games.TTControllers;
+import org.bson.Document;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +32,22 @@ public class TTTGameH implements GameHelper2<ScoredTTT> {
     private final Hashids idGenerator = new Hashids(getClass().getSimpleName());
     private final AtomicInteger gameId = new AtomicInteger();
     private final JsonNodeFactory nodeFactory = new JsonNodeFactory(false);
+    private final QStore<String> qStore;
     private Map<String, ScoredTTT.ScoredTTTQLearn> qaiMap = new HashMap<>();
+
+    public TTTGameH() {
+        QStore<String> store;
+        try {
+            MongoClient client = new MongoClient();
+            MongoDatabase mongoDB = client.getDatabase("flexgame_server");
+            MongoCollection<Document> mongoCollection = mongoDB.getCollection("qlearn_ttt");
+            store = new QStoreMongo<>(mongoCollection);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            store = new QStoreMap<>();
+        }
+        this.qStore = store;
+    }
 
     @Override
     public LobbyGame<ScoredTTT> createGame(Object gameConfiguration) {
@@ -50,7 +70,8 @@ public class TTTGameH implements GameHelper2<ScoredTTT> {
             return Optional.empty();
         }
         if (aiName.startsWith("Q")) {
-            MyQLearning<TTController, String> learn = TTTQLearn.newLearner(new QStoreMap<>());
+            MyQLearning<TTController, String> learn = TTTQLearn.newLearner(qStore);
+            learn.setRandomMoveProbability(0);
             qaiMap.putIfAbsent(aiName, new ScoredTTT.ScoredTTTQLearn(learn));
             return Optional.of(qaiMap.get(aiName));
         }
