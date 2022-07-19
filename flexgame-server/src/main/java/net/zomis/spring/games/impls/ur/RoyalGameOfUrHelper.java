@@ -42,6 +42,14 @@ public class RoyalGameOfUrHelper implements GameHelper2<RoyalGameOfUr> {
         if (game.getPlayers().size() >= 2) {
             return Optional.empty();
         }
+        if (aiName.equals("MonteCarlo")) {
+            URScorer ai = new URScorer("MonteCarlo", RoyalGameOfUrAIs.scf()
+                    .withScorer(knockout, 5)
+                    .withScorer(gotoFlower, 2)
+                    .withScorer(riskOfBeingTaken, -0.1)
+                    .withScorer(exit));
+            return Optional.of(new MonteCarloAI(1000, ai));
+        }
         if (aiName.equals("KFE521S3")) {
             URScorer ai = new URScorer("KFE521S3", RoyalGameOfUrAIs.scf()
                     .withScorer(knockout, 5)

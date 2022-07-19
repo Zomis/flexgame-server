@@ -121,7 +121,7 @@ Fxxx  Fx
     }
 
     public boolean canMove(int playerIndex, int position, int steps) {
-        return canMoveTo(playerIndex, position + steps);
+        return playerOccupies(playerIndex, position) && canMoveTo(playerIndex, position + steps);
     }
 
     public boolean move(int playerIndex, int position, int steps) {
@@ -187,6 +187,87 @@ Fxxx  Fx
 
     public boolean canKnockout(int position) {
         return position > 4 && position < EXIT - 2 && !isFlower(position);
+    }
+
+    @Override
+    public String toString() {
+        return "RoyalGameOfUr{" +
+                "pieces=" + Arrays.deepToString(pieces) +
+                ", currentPlayer=" + currentPlayer +
+                ", roll=" + roll +
+                '}';
+    }
+
+    public long toLong() {
+        int cp = getCurrentPlayer();
+        int op = 1 - cp;
+
+        long result = 0;
+        int numberHome1 = (int) Arrays.stream(pieces[cp]).filter(i -> i == 0).count();
+        int numberHome2 = (int) Arrays.stream(pieces[op]).filter(i -> i == 0).count();
+        int numberGoal1 = (int) Arrays.stream(pieces[cp]).filter(i -> i == EXIT).count();
+        int numberGoal2 = (int) Arrays.stream(pieces[op]).filter(i -> i == EXIT).count();
+        int dice = getRoll() - 1; // 1..4 --> 0..3
+        if (isFinished()) {
+            dice = 0;
+        } else if (dice < 0 || dice >= 4) {
+            throw new IllegalStateException("Invalid dice value for serializing: " + dice);
+        }
+        boolean[] p1 = piecesToArray(pieces[cp]);
+        boolean[] p2 = piecesToArray(pieces[op]);
+
+        result += numberHome1;
+        result = result << 3;
+        result += numberHome2;
+        result = result << 3;
+        result += numberGoal1;
+        result = result << 3;
+        result += numberGoal2;
+        result = result << 3;
+
+        result += dice;
+        result = result << 2;
+        for (boolean b : p1) {
+            result += b ? 1 : 0;
+            result = result << 1;
+        }
+        for (boolean b : p2) {
+            result += b ? 1 : 0;
+            result = result << 1;
+        }
+        return result;
+    }
+
+    private boolean[] piecesToArray(int[] pieces) {
+        boolean[] result = new boolean[14];
+        for (int p : pieces) {
+            if (p != 0 && p != 15) {
+                result[p - 1] = true;
+            }
+        }
+        return result;
+    }
+
+    public String toCompactString() {
+        StringBuilder str = new StringBuilder();
+        str.append(currentPlayer);
+        int[] p0 = Arrays.copyOf(pieces[0], pieces[0].length);
+        Arrays.sort(p0);
+
+        int[] p1 = Arrays.copyOf(pieces[1], pieces[1].length);
+        Arrays.sort(p1);
+
+        for (int aP0 : p0) {
+            str.append(aP0);
+        }
+        for (int aP1 : p1) {
+            str.append(aP1);
+        }
+        return str.toString();
+    }
+
+    public RoyalGameOfUr copy() {
+        return new RoyalGameOfUr(this.currentPlayer, this.roll, getPiecesCopy());
     }
 
 }

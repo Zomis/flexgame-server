@@ -11,8 +11,8 @@ import net.zomis.aiscores.scorers.SimpleScorer;
 import net.zomis.spring.games.generic.PlayerInGame;
 import net.zomis.spring.games.generic.v2.ActionV2;
 import net.zomis.spring.games.generic.v2.PlayerController;
+import net.zomis.spring.games.impls.MyQLearning;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
@@ -25,7 +25,7 @@ public class RoyalGameOfUrAIs {
     public interface AI extends PlayerController<RoyalGameOfUr> {}
 
     private static final Collection<Integer> fields = IntStream.range(0, 7).mapToObj(i -> i).collect(Collectors.toList());
-    private static final ScoreStrategy<RoyalGameOfUr, Integer> scoreStrategy = new ScoreStrategy<RoyalGameOfUr, Integer>() {
+    public static final ScoreStrategy<RoyalGameOfUr, Integer> scoreStrategy = new ScoreStrategy<RoyalGameOfUr, Integer>() {
 
         @Override
         public Collection<Integer> getFieldsToScore(RoyalGameOfUr ai) {
@@ -44,7 +44,7 @@ public class RoyalGameOfUrAIs {
         return new ScoreConfigFactory<>();
     }
 
-    public static class URScorer implements AI {
+    public static class URScorer extends RoyalAI {
 
         private final String name;
         public final FieldScoreProducer<RoyalGameOfUr, Integer> producer;
@@ -59,22 +59,12 @@ public class RoyalGameOfUrAIs {
         }
 
         @Override
-        public Optional<ActionV2> control(RoyalGameOfUr game, PlayerInGame player) {
-            if (game.getCurrentPlayer() != player.getIndex()) {
-                return Optional.empty();
-            }
-            if (game.isRollTime()) {
-                return Optional.of(new ActionV2("roll", null));
-            }
-            if (!game.isMoveTime()) {
-                return Optional.empty();
-            }
+        public int positionToMove(RoyalGameOfUr game) {
             ParamAndField<RoyalGameOfUr, Integer> best = ScoreUtils.pickBest(producer, game, new Random());
             if (best == null) {
-                return Optional.empty();
+                throw new IllegalStateException("Nothing was best in " + game);
             }
-            int positionOfBest = game.getPieces()[player.getIndex()][best.getField()];
-            return Optional.of(new ActionV2("move", new JsonNodeFactory(false).numberNode(positionOfBest)));
+            return game.getPieces()[game.getCurrentPlayer()][best.getField()];
         }
 
         @Override
